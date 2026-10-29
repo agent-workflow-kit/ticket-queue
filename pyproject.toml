@@ -1,6 +1,6 @@
 [project]
 name = "ticket-queue"
-version = "0.0.0"
+version = "0.0.1"
 description = "Answers \"which ticket should I do next?\" with filters, scoring and claims."
 readme = "README.md"
 requires-python = ">=3.12"
