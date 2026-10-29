@@ -1,0 +1,2 @@
+# Example config for ticket-queue. Location: ~/.config/ticket-queue/config.yaml (drop-ins: config.d/*.yaml). Keys are defined in docs/interface.md once designed.
+hooks: {}
