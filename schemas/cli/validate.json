@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/validate.json",
+  "title": "validate --json",
+  "description": "Config, plugin and ticketctl checks; probe is present only with --probe.",
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]{0,63}$"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 1024,
+            "x-untrusted": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "ok"
+        ]
+      }
+    },
+    "claude_session_version": {
+      "oneOf": [
+        {
+          "type": "string",
+          "maxLength": 64
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ticketctl_version": {
+      "oneOf": [
+        {
+          "type": "string",
+          "maxLength": 64
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "probe": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "probe_ok": {
+              "type": "boolean"
+            },
+            "sandbox_active": {
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "duration_ms": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "cost_usd": {
+              "oneOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "reason": {
+              "oneOf": [
+                {
+                  "$ref": "../defs.json#/$defs/rerank_reason"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "probe_ok",
+            "sandbox_active",
+            "duration_ms",
+            "cost_usd"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "ok",
+    "checks",
+    "probe",
+    "warnings"
+  ]
+}

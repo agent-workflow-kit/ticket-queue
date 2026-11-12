@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/boards.json",
+  "title": "boards --json",
+  "description": "The configured boards in config order and their state.",
+  "type": "object",
+  "properties": {
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "refreshed_at": {
+      "$ref": "../defs.json#/$defs/refreshed_at"
+    },
+    "stale": {
+      "type": "boolean"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/error_body"
+      }
+    },
+    "boards": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/board_state"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "count",
+    "refreshed_at",
+    "stale",
+    "complete",
+    "errors",
+    "boards"
+  ]
+}

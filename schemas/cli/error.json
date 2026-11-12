@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/error.json",
+  "title": "Error envelope (any command with --json)",
+  "description": "Printed on stdout alone for exit codes 2, 10, 20, 21 and a total 12.",
+  "type": "object",
+  "properties": {
+    "error": {
+      "$ref": "../defs.json#/$defs/error_body"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "error"
+  ]
+}

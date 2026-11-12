@@ -1,33 +1,896 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "ticket-queue/log",
+  "$id": "ticket-queue/log.json",
   "title": "ticket-queue log.jsonl record",
-  "type": "object",
-  "properties": {
-    "ts": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "level": {
-      "type": "string",
-      "enum": [
-        "debug",
-        "info",
-        "warn",
-        "error"
+  "description": "Public operational log, one record per line. No ticket text beyond keys (a skip reason is recorded as a byte count). level is optional.",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "refresh"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "board": {
+          "$ref": "defs.json#/$defs/board_name"
+        },
+        "status": {
+          "$ref": "defs.json#/$defs/board_status"
+        },
+        "mode": {
+          "enum": [
+            "full",
+            "incremental"
+          ]
+        },
+        "counts": {
+          "$ref": "defs.json#/$defs/counts"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "error_code": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/error_code"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "board",
+        "status",
+        "counts",
+        "duration_ms"
       ]
     },
-    "event": {
-      "type": "string"
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "claim"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "board": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/board_name"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "holder": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/holder"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "renewed": {
+          "type": "boolean"
+        },
+        "expires_at": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "key",
+        "site",
+        "renewed",
+        "expires_at"
+      ]
     },
-    "message": {
-      "type": "string"
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "release"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "board": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/board_name"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "holder": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/holder"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "failed": {
+          "type": "boolean"
+        },
+        "forced": {
+          "type": "boolean"
+        },
+        "reason": {
+          "enum": [
+            "released",
+            "pruned"
+          ]
+        },
+        "consecutive_failures": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "key",
+        "site",
+        "failed"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "claim_lapsed"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "board": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/board_name"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "holder": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/holder"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expires_at": {
+          "$ref": "defs.json#/$defs/ts"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "key",
+        "site",
+        "expires_at"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "auto_skip"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "failures": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "key",
+        "site",
+        "failures"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "pin"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "position": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "expires_at": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/ts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "key",
+        "site",
+        "position"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "unpin"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "key",
+        "site"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "move"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "from": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "to": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "key",
+        "site",
+        "to"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "skip"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "source": {
+          "enum": [
+            "human",
+            "auto"
+          ]
+        },
+        "until": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/ts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "key",
+        "site",
+        "source"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "unskip"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "key",
+        "site"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "pin_dropped"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "reason": {
+          "enum": [
+            "done",
+            "gone",
+            "expired",
+            "removed"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "key",
+        "site",
+        "reason"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "rerank"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "board": {
+          "$ref": "defs.json#/$defs/board_name"
+        },
+        "outcome": {
+          "enum": [
+            "ok",
+            "failed"
+          ]
+        },
+        "reason": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/rerank_reason"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "run_id": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/run_id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "duration_ms": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cost_usd": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sandbox_active": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "board",
+        "outcome"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "rerank_skipped"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "board": {
+          "$ref": "defs.json#/$defs/board_name"
+        },
+        "reason": {
+          "$ref": "defs.json#/$defs/rerank_skip_reason"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "board",
+        "reason"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "prune"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "dry_run": {
+          "type": "boolean"
+        },
+        "counts": {
+          "$ref": "defs.json#/$defs/counts"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "counts"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "hook_failed"
+        },
+        "v": {
+          "const": 1
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "hook": {
+          "$ref": "defs.json#/$defs/hook_name"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "exit": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timed_out": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "ts",
+        "actor",
+        "decision_ids",
+        "hook",
+        "event_id"
+      ]
     }
-  },
-  "required": [
-    "ts",
-    "level",
-    "event"
-  ],
-  "additionalProperties": true
+  ]
 }

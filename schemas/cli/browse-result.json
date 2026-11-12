@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/browse-result.json",
+  "title": "browse --result-file document",
+  "description": "Written by the TUI on exit 0 when --result-file is given. Ids only; no ticket text.",
+  "type": "object",
+  "properties": {
+    "intent": {
+      "enum": [
+        "start",
+        "open",
+        "back"
+      ]
+    },
+    "selected": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "$ref": "../defs.json#/$defs/key"
+          },
+          "site": {
+            "$ref": "../defs.json#/$defs/site_name"
+          },
+          "board": {
+            "oneOf": [
+              {
+                "$ref": "../defs.json#/$defs/board_name"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "site",
+          "board"
+        ]
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "intent",
+    "selected"
+  ]
+}

@@ -1,0 +1,350 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/rerank-input.json",
+  "title": "Re-rank input document (stdin of a custom command; candidates.md of the bundled implementation)",
+  "description": "The text fields of a candidate (title, description, labels, epic and parent titles) are untrusted and travel inside an <untrusted> fence in the bundled implementation. goals is the board's trusted free text.",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "run_id": {
+      "$ref": "defs.json#/$defs/run_id"
+    },
+    "board": {
+      "$ref": "defs.json#/$defs/board_name"
+    },
+    "goals": {
+      "type": "string",
+      "maxLength": 20000
+    },
+    "prioritized_epics": {
+      "type": "array",
+      "items": {
+        "$ref": "defs.json#/$defs/key"
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "$ref": "defs.json#/$defs/key"
+          },
+          "position": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "deterministic_score": {
+            "type": "number"
+          },
+          "signals": {
+            "type": "object",
+            "properties": {
+              "priority": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "sprint": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "epic": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "due": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "assignee": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "age": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "labels": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "size": {
+                "oneOf": [
+                  {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "priority",
+              "sprint",
+              "epic",
+              "due",
+              "assignee",
+              "age",
+              "labels",
+              "size"
+            ],
+            "description": "Normalized signal values; null when unknown."
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 4096,
+            "x-untrusted": true
+          },
+          "description": {
+            "oneOf": [
+              {
+                "type": "string",
+                "maxLength": 8192,
+                "x-untrusted": true
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "string",
+                "maxLength": 256
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "string",
+                "maxLength": 256
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "priority": {
+            "oneOf": [
+              {
+                "type": "string",
+                "maxLength": 256
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimate": {
+            "oneOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sprint": {
+            "enum": [
+              "active",
+              "future",
+              "closed",
+              "none"
+            ]
+          },
+          "epic": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "$ref": "defs.json#/$defs/key"
+                  },
+                  "title": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 4096,
+                        "x-untrusted": true
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "key",
+                  "title"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "$ref": "defs.json#/$defs/key"
+                  },
+                  "title": {
+                    "oneOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 4096,
+                        "x-untrusted": true
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "key",
+                  "title"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 256,
+              "x-untrusted": true
+            }
+          },
+          "due_date": {
+            "oneOf": [
+              {
+                "$ref": "defs.json#/$defs/date"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "age_days": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "position",
+          "deterministic_score",
+          "signals",
+          "title",
+          "description",
+          "type",
+          "status",
+          "priority",
+          "estimate",
+          "sprint",
+          "epic",
+          "parent",
+          "labels",
+          "due_date",
+          "age_days"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 30
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "board",
+    "goals",
+    "prioritized_epics",
+    "candidates"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/unskip.json",
+  "title": "unskip --json",
+  "description": "Idempotent: unchanged true when no skip was active.",
+  "type": "object",
+  "properties": {
+    "key": {
+      "$ref": "../defs.json#/$defs/key"
+    },
+    "site": {
+      "$ref": "../defs.json#/$defs/site_name"
+    },
+    "ended": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/skip"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "unchanged": {
+      "type": "boolean"
+    },
+    "dry_run": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "key",
+    "site",
+    "ended",
+    "unchanged",
+    "dry_run"
+  ]
+}

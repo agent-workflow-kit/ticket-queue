@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/next.json",
+  "title": "next --json",
+  "description": "The top eligible ticket. With no candidate (exit 22) empty is true and ticket null. passed_over lists tickets that failed the live re-check under --claim. claim is the written claim with --claim, else null.",
+  "type": "object",
+  "properties": {
+    "empty": {
+      "type": "boolean"
+    },
+    "ticket": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/ticket"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "claim": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/claim"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "renewed": {
+      "type": "boolean"
+    },
+    "passed_over": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "$ref": "../defs.json#/$defs/key"
+          },
+          "site": {
+            "$ref": "../defs.json#/$defs/site_name"
+          },
+          "outcome": {
+            "const": "claim_skipped"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 128
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "site",
+          "outcome",
+          "reason"
+        ]
+      }
+    },
+    "refreshed": {
+      "type": "boolean"
+    },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
+    "refreshed_at": {
+      "$ref": "../defs.json#/$defs/refreshed_at"
+    },
+    "stale": {
+      "type": "boolean"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/error_body"
+      }
+    },
+    "boards": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/board_state"
+      }
+    },
+    "dry_run": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "empty",
+    "ticket",
+    "claim",
+    "passed_over",
+    "refreshed_at",
+    "stale",
+    "complete",
+    "errors",
+    "boards",
+    "dry_run"
+  ]
+}

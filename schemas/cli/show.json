@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/show.json",
+  "title": "show --json",
+  "description": "One stored ticket with its verdicts and state. Reads the store only.",
+  "type": "object",
+  "properties": {
+    "ticket": {
+      "$ref": "../defs.json#/$defs/ticket"
+    },
+    "refreshed_at": {
+      "$ref": "../defs.json#/$defs/refreshed_at"
+    },
+    "stale": {
+      "type": "boolean"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/error_body"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "ticket",
+    "refreshed_at",
+    "stale",
+    "complete",
+    "errors"
+  ]
+}

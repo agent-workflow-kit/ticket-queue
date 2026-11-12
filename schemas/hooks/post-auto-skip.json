@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/hooks/post-auto-skip.json",
+  "title": "post-auto-skip hook payload (stdin)",
+  "description": "After release --failed reached claim.max_failures and an auto skip was created. Delivered at least once through the outbox; deduplicate on event_id. No ticket text and no repo.",
+  "type": "object",
+  "properties": {
+    "tool": {
+      "const": "ticket-queue"
+    },
+    "hook": {
+      "const": "post-auto-skip"
+    },
+    "event_id": {
+      "$ref": "../defs.json#/$defs/event_id"
+    },
+    "object_type": {
+      "const": "ticket"
+    },
+    "object_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+    },
+    "board": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/board_name"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "key": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/key"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "site": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/site_name"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "holder": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/holder"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "labels": {
+      "$ref": "../defs.json#/$defs/claim_labels"
+    },
+    "counts": {
+      "$ref": "../defs.json#/$defs/counts"
+    },
+    "skip_source": {
+      "const": "auto"
+    },
+    "failures": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "tool",
+    "hook",
+    "event_id",
+    "object_type",
+    "object_id",
+    "board",
+    "key",
+    "site",
+    "holder",
+    "labels",
+    "counts",
+    "skip_source",
+    "failures"
+  ]
+}

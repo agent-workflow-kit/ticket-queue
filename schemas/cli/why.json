@@ -1,0 +1,248 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/why.json",
+  "title": "why --json",
+  "description": "Explains a ticket's score, verdicts and position. Reads the store only; all text is sanitized.",
+  "type": "object",
+  "properties": {
+    "ticket": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "../defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "../defs.json#/$defs/site_name"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 4096,
+          "x-untrusted": true
+        },
+        "status": {
+          "$ref": "../defs.json#/$defs/status"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "site"
+      ]
+    },
+    "board": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/board_name"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "signals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "signal": {
+            "enum": [
+              "priority",
+              "sprint",
+              "epic",
+              "due",
+              "assignee",
+              "age",
+              "labels",
+              "size"
+            ]
+          },
+          "raw": {
+            "description": "The raw input (string, number, boolean, null or list); untrusted when it comes from ticket text.",
+            "x-untrusted": true
+          },
+          "normalized": {
+            "oneOf": [
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "weight": {
+            "type": "number",
+            "minimum": 0
+          },
+          "contribution": {
+            "type": "number",
+            "minimum": 0
+          },
+          "shown": {
+            "enum": [
+              "value",
+              "unknown",
+              "none"
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "signal",
+          "raw",
+          "normalized",
+          "weight",
+          "contribution",
+          "shown"
+        ]
+      }
+    },
+    "deterministic_score": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "effective_score": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "position": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "eligible": {
+      "type": "boolean"
+    },
+    "verdicts": {
+      "$ref": "../defs.json#/$defs/verdicts"
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 128
+      }
+    },
+    "pin": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/pin"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "skip": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/skip"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "claim": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/claim"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "claim_state": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/claim_state"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "rerank": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/rerank_ref"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "rerank_summary": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/rerank_summary"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
+    "refreshed_at": {
+      "$ref": "../defs.json#/$defs/refreshed_at"
+    },
+    "stale": {
+      "type": "boolean"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/error_body"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "ticket",
+    "board",
+    "signals",
+    "deterministic_score",
+    "effective_score",
+    "position",
+    "eligible",
+    "verdicts",
+    "reasons",
+    "pin",
+    "skip",
+    "claim",
+    "claim_state",
+    "rerank",
+    "rerank_summary",
+    "warnings",
+    "refreshed_at",
+    "stale",
+    "complete",
+    "errors"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/prune.json",
+  "title": "prune --json",
+  "description": "Counts of what was (or with --dry-run would be) removed.",
+  "type": "object",
+  "properties": {
+    "dry_run": {
+      "type": "boolean"
+    },
+    "removed": {
+      "type": "object",
+      "properties": {
+        "tickets": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rerank_results": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "events": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "claims_released": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "tickets",
+        "rerank_results",
+        "events",
+        "claims_released"
+      ]
+    },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "dry_run",
+    "removed",
+    "warnings"
+  ]
+}

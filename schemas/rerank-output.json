@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/rerank-output.json",
+  "title": "Re-rank output document (stdout of a custom command; ranking.json of the bundled implementation)",
+  "description": "Exactly these keys. ranking plus excluded must equal the candidate key set exactly. The document is at most 32 KiB (a limit JSON Schema cannot express; ticket-queue checks it before parsing). skill_marker is required of the bundled implementation only.",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "run_id": {
+      "$ref": "defs.json#/$defs/run_id"
+    },
+    "ranking": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "$ref": "defs.json#/$defs/key"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 200,
+            "x-untrusted": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "reason"
+        ]
+      },
+      "maxItems": 30
+    },
+    "excluded": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "$ref": "defs.json#/$defs/key"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 200,
+            "x-untrusted": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "reason"
+        ]
+      },
+      "maxItems": 30
+    },
+    "skill_marker": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{1,128}$"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "ranking"
+  ]
+}

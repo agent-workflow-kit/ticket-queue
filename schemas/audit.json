@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-queue/audit",
   "title": "ticket-queue audit.jsonl record",
-  "description": "Audit record for ticket-queue. Whether this tool writes audit records is decided in its design session (architecture §14).",
+  "description": "Empty contract. ticket-queue takes no external action, so no audit.jsonl record is written in 0.x; this file exists only for tools that read every tool's audit schema. The shape is the scaffold's.",
   "type": "object",
   "properties": {
     "ts": {

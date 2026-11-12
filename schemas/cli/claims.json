@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/claims.json",
+  "title": "claims --json",
+  "description": "Live claims with their ticket state.",
+  "type": "object",
+  "properties": {
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "claim": {
+            "$ref": "../defs.json#/$defs/claim"
+          },
+          "ticket_state": {
+            "$ref": "../defs.json#/$defs/claim_state"
+          },
+          "ticket": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "$ref": "../defs.json#/$defs/key"
+                  },
+                  "site": {
+                    "$ref": "../defs.json#/$defs/site_name"
+                  },
+                  "title": {
+                    "type": "string",
+                    "maxLength": 4096,
+                    "x-untrusted": true
+                  },
+                  "status": {
+                    "$ref": "../defs.json#/$defs/status"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "key",
+                  "site"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "expires_in_s": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "claim",
+          "ticket_state",
+          "ticket"
+        ]
+      }
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "refreshed_at": {
+      "$ref": "../defs.json#/$defs/refreshed_at"
+    },
+    "stale": {
+      "type": "boolean"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/error_body"
+      }
+    },
+    "boards": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/board_state"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "claims",
+    "count",
+    "refreshed_at",
+    "stale",
+    "complete",
+    "errors",
+    "boards"
+  ]
+}

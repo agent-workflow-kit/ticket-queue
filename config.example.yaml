@@ -1,2 +1,116 @@
-# Example config for ticket-queue. Location: ~/.config/ticket-queue/config.yaml (drop-ins: config.d/*.yaml). Keys are defined in docs/interface.md once designed.
-hooks: {}
+# Example config for ticket-queue.
+# Location: ~/.config/ticket-queue/config.yaml (respects XDG_CONFIG_HOME); drop-ins in config.d/*.yaml merge in
+# lexical order after it (maps merge, hook lists append). Every key below is shown with its default unless noted.
+# Durations are strings such as 30m, 24h, 7d (units ms, s, m, h, d, w).
+# Environment: scalars can be set as TICKET_QUEUE_<KEY>, nested keys joined with __ (TICKET_QUEUE_REFRESH__STALE_AFTER).
+
+me:
+  name: sam                       # actor name; default: the OS username
+  jira: "Sam Example"             # expected ticketctl account display name (a mismatch warns); default: unset
+
+ticketctl:
+  config: null                    # an explicit ticketctl --config path
+  pass_env: []                    # env variable names handed to the ticketctl child (besides PATH, HOME, XDG, TICKETCTL_*)
+  default_site: example           # site for a board that names none; default: null
+
+# Boards are listed in order; a ticket in several pools belongs to the first board that contains it.
+boards:
+  main:
+    site: example                 # default: ticketctl.default_site
+    source:                       # required: a ticketctl named query ...
+      query: my-open-work
+    goals: ""                     # free text, trusted (your own text); default: empty
+    # goals_file: /path/to/goals.md   # alternative to goals
+    prioritized_epics: []         # epic keys in priority order, e.g. [PROJ-1, PROJ-7]
+    parent_allow: []              # parent or epic keys; when not empty, one of them must match
+    parent_deny: []               # parent or epic keys that exclude a ticket
+    rules:                        # turn a rule off with false (or any)
+      status_category: [new]      # list of new, indeterminate; or false
+      pointed: true
+      sprint: open                # open, open_or_future, any, or false
+      unblocked: true
+      assignee: me_or_none        # me_or_none, me, none, any, or false
+    weights:                      # per-signal weights (defaults shown)
+      priority: 40
+      sprint: 25
+      epic: 20
+      due: 20
+      assignee: 10
+      age: 5
+      labels: 0
+      size: 0
+    signals:
+      priority_map: {Highest: 1, High: 0.75, Medium: 0.5, Low: 0.25, Lowest: 0}
+      priority_levels: 5
+      sprint: {active: 1, future: 0.3}
+      label_bonus: {}             # label -> bonus, summed and capped at 1
+    rerank:
+      enabled: false              # per-board switch (needs the global rerank.enabled)
+      top_n: 20                   # at most 30
+  # A board built from structured flags instead of a named query:
+  # backlog:
+  #   source:
+  #     projects: [PROJ]          # any of projects, types, labels, assignee (none, me), sprint (open, future)
+  #     assignee: [none, me]
+  #     sprint: [open, future]
+
+claim:
+  ttl: 72h                        # claim lifetime without renewal
+  max_ttl: 30d                    # upper bound for --ttl
+  max_failures: 3                 # consecutive failed releases before an auto-skip
+  dead_grace: 7d                  # age of a done or gone claimed ticket before prune releases the claim
+
+refresh:
+  stale_after: 30m                # pool age shown as stale
+  full_every: 24h                 # full rebuild interval
+  overlap: 5m                     # incremental refresh overlap
+  max_pages: 20                   # pages per board and refresh
+
+rerank:
+  enabled: false                  # the global re-rank switch
+  command: null                   # a custom argv list (no shell); null is the bundled implementation
+  skill: "ticket-queue:rank-tickets"
+  # marker: the bundled marker value by default; null disables the marker check (needed by a custom skill)
+  model: haiku
+  top_n: 20                       # candidates given (at most 30)
+  description_chars: 1000         # description cut per candidate
+  ttl: 24h                        # lifetime of a result
+  min_interval: 1h                # minimum time between automatic runs
+  daily_limit: 8                  # automatic runs per local day
+  auto: false                     # run after each refresh when the input changed
+  permission_profile: null        # a profile file replacing the bundled plugin/profiles/rank.yaml
+  sandbox: preferred              # required, preferred or off
+  setting_sources: []             # passed with --setting-sources (user, project, local)
+  env_allowlist: [PATH]           # passed with --env-allowlist-only
+  max_turns: 12                   # loose safety cap
+  timeout: 150s                   # wall-clock bound
+
+hidden:                           # glob lists (* and ?) applied when a pool is stored; always on, no reveal
+  projects: []
+  labels: []
+
+browse:
+  refresh_interval: 120s          # automatic refresh in the TUI; 0 turns it off
+  detail_collapsed: []            # facts, description, score, links, comments, history
+  query: null                     # default query (written by the TUI to config.d/90-browse-query.yaml)
+
+cron:
+  env_file: null                  # a user-owned env file sourced by the cron line
+
+# Post-hooks only in 0.x. Each entry: cmd (run via sh -c), timeout (default 30 seconds), async (default false).
+hooks:
+  post-claim: []
+  post-release: []
+  post-auto-skip: []
+  post-refresh: []
+  post-rerank: []
+  # post-claim:
+  #   - {cmd: "notify-send claimed", timeout: 10, async: true}
+
+log:
+  max_bytes: 10MiB                # log.jsonl rotation size
+  keep: 3                         # rotated files kept
+
+retention:
+  tickets: 30d                    # prune: tickets in no pool, not claimed or pinned
+  events: 14d                     # prune: delivered outbox events

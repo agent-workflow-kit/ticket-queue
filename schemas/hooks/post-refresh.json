@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/hooks/post-refresh.json",
+  "title": "post-refresh hook payload (stdin)",
+  "description": "After a refresh in which a board failed or was truncated, or a claimed ticket's state changed to non-ok. object_id is the board name (or the first failing board). Delivered at least once through the outbox; deduplicate on event_id. No ticket text and no repo.",
+  "type": "object",
+  "properties": {
+    "tool": {
+      "const": "ticket-queue"
+    },
+    "hook": {
+      "const": "post-refresh"
+    },
+    "event_id": {
+      "$ref": "../defs.json#/$defs/event_id"
+    },
+    "object_type": {
+      "const": "board"
+    },
+    "object_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+    },
+    "board": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/board_name"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "key": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/key"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "site": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/site_name"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "holder": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/holder"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "labels": {
+      "$ref": "../defs.json#/$defs/claim_labels"
+    },
+    "counts": {
+      "$ref": "../defs.json#/$defs/counts"
+    },
+    "boards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "board": {
+            "$ref": "../defs.json#/$defs/board_name"
+          },
+          "status": {
+            "$ref": "../defs.json#/$defs/board_status"
+          },
+          "error_code": {
+            "oneOf": [
+              {
+                "$ref": "../defs.json#/$defs/error_code"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "board",
+          "status",
+          "error_code"
+        ]
+      }
+    },
+    "changed_claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "$ref": "../defs.json#/$defs/key"
+          },
+          "site": {
+            "$ref": "../defs.json#/$defs/site_name"
+          },
+          "ticket_state": {
+            "$ref": "../defs.json#/$defs/claim_state"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "site",
+          "ticket_state"
+        ]
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "tool",
+    "hook",
+    "event_id",
+    "object_type",
+    "object_id",
+    "board",
+    "key",
+    "site",
+    "holder",
+    "labels",
+    "counts",
+    "boards",
+    "changed_claims"
+  ]
+}

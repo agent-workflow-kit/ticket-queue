@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/release.json",
+  "title": "release --json",
+  "description": "Idempotent: unchanged true when the ticket was not claimed. auto_skip is the skip created when claim.max_failures was reached.",
+  "type": "object",
+  "properties": {
+    "key": {
+      "$ref": "../defs.json#/$defs/key"
+    },
+    "site": {
+      "$ref": "../defs.json#/$defs/site_name"
+    },
+    "released": {
+      "type": "boolean"
+    },
+    "unchanged": {
+      "type": "boolean"
+    },
+    "failed": {
+      "type": "boolean"
+    },
+    "forced": {
+      "type": "boolean"
+    },
+    "consecutive_failures": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "auto_skip": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/skip"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "dry_run": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "key",
+    "site",
+    "released",
+    "unchanged",
+    "failed",
+    "forced",
+    "consecutive_failures",
+    "auto_skip",
+    "dry_run"
+  ]
+}

@@ -1,12 +1,744 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "ticket-queue/config",
+  "$id": "ticket-queue/config.json",
   "title": "ticket-queue config",
+  "description": "Config file (config.yaml plus config.d drop-ins merged). Self-contained: no external $ref. Environment variables can set top-level and nested scalars only (TICKET_QUEUE_<KEY>, nested keys joined with __).",
   "type": "object",
   "properties": {
+    "me": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._@-]{1,64}$"
+        },
+        "jira": {
+          "type": "string",
+          "maxLength": 256
+        }
+      },
+      "additionalProperties": false
+    },
+    "ticketctl": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pass_env": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}$"
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "default_site": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/site_name"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "boards": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/board_name"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/board"
+      },
+      "description": "Named boards in config order; a ticket in several pools belongs to the first."
+    },
+    "claim": {
+      "type": "object",
+      "properties": {
+        "ttl": {
+          "$ref": "#/$defs/duration",
+          "default": "72h"
+        },
+        "max_ttl": {
+          "$ref": "#/$defs/duration",
+          "default": "30d"
+        },
+        "max_failures": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 3
+        },
+        "dead_grace": {
+          "$ref": "#/$defs/duration",
+          "default": "7d"
+        }
+      },
+      "additionalProperties": false
+    },
+    "refresh": {
+      "type": "object",
+      "properties": {
+        "stale_after": {
+          "$ref": "#/$defs/duration",
+          "default": "30m"
+        },
+        "full_every": {
+          "$ref": "#/$defs/duration",
+          "default": "24h"
+        },
+        "overlap": {
+          "$ref": "#/$defs/duration",
+          "default": "5m"
+        },
+        "max_pages": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "rerank": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "command": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "skill": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "default": "ticket-queue:rank-tickets"
+        },
+        "marker": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9._-]{1,128}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "default": "haiku"
+        },
+        "top_n": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30,
+          "default": 20
+        },
+        "description_chars": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8192,
+          "default": 1000
+        },
+        "ttl": {
+          "$ref": "#/$defs/duration",
+          "default": "24h"
+        },
+        "min_interval": {
+          "$ref": "#/$defs/duration",
+          "default": "1h"
+        },
+        "daily_limit": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 8
+        },
+        "auto": {
+          "type": "boolean",
+          "default": false
+        },
+        "permission_profile": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sandbox": {
+          "enum": [
+            "required",
+            "preferred",
+            "off"
+          ],
+          "default": "preferred"
+        },
+        "setting_sources": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "user",
+              "project",
+              "local"
+            ]
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "env_allowlist": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}$"
+          },
+          "uniqueItems": true,
+          "default": [
+            "PATH"
+          ]
+        },
+        "max_turns": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 12
+        },
+        "timeout": {
+          "$ref": "#/$defs/duration",
+          "default": "150s"
+        }
+      },
+      "additionalProperties": false
+    },
+    "hidden": {
+      "type": "object",
+      "properties": {
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "default": []
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "browse": {
+      "type": "object",
+      "properties": {
+        "refresh_interval": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/duration"
+            },
+            {
+              "const": 0
+            }
+          ],
+          "default": "120s"
+        },
+        "detail_collapsed": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "facts",
+              "description",
+              "score",
+              "links",
+              "comments",
+              "history"
+            ]
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "query": {
+          "oneOf": [
+            {
+              "type": "string",
+              "maxLength": 1000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "cron": {
+      "type": "object",
+      "properties": {
+        "env_file": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
     "hooks": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "post-claim": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/hook_entry"
+          },
+          "default": []
+        },
+        "post-release": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/hook_entry"
+          },
+          "default": []
+        },
+        "post-auto-skip": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/hook_entry"
+          },
+          "default": []
+        },
+        "post-refresh": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/hook_entry"
+          },
+          "default": []
+        },
+        "post-rerank": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/hook_entry"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "log": {
+      "type": "object",
+      "properties": {
+        "max_bytes": {
+          "type": "string",
+          "pattern": "^[0-9]{1,9}(B|KiB|MiB|GiB)$",
+          "default": "10MiB"
+        },
+        "keep": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 3
+        }
+      },
+      "additionalProperties": false
+    },
+    "retention": {
+      "type": "object",
+      "properties": {
+        "tickets": {
+          "$ref": "#/$defs/duration",
+          "default": "30d"
+        },
+        "events": {
+          "$ref": "#/$defs/duration",
+          "default": "14d"
+        }
+      },
+      "additionalProperties": false
     }
   },
-  "additionalProperties": true
+  "additionalProperties": false,
+  "$defs": {
+    "board": {
+      "type": "object",
+      "properties": {
+        "site": {
+          "$ref": "#/$defs/site_name"
+        },
+        "source": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "query": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "query"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "projects": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/project_key"
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "types": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "labels": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "assignee": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "none",
+                      "me"
+                    ]
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "sprint": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "open",
+                      "future"
+                    ]
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                }
+              },
+              "additionalProperties": false,
+              "minProperties": 1
+            }
+          ]
+        },
+        "goals": {
+          "type": "string",
+          "maxLength": 20000,
+          "default": ""
+        },
+        "goals_file": {
+          "type": "string",
+          "minLength": 1
+        },
+        "prioritized_epics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/key"
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "parent_allow": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/key"
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "parent_deny": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/key"
+          },
+          "uniqueItems": true,
+          "default": []
+        },
+        "rules": {
+          "type": "object",
+          "properties": {
+            "status_category": {
+              "oneOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "new",
+                      "indeterminate"
+                    ]
+                  },
+                  "uniqueItems": true,
+                  "minItems": 1
+                },
+                {
+                  "const": false
+                }
+              ],
+              "default": [
+                "new"
+              ]
+            },
+            "pointed": {
+              "type": "boolean",
+              "default": true
+            },
+            "sprint": {
+              "enum": [
+                "open",
+                "open_or_future",
+                "any",
+                false
+              ],
+              "default": "open"
+            },
+            "unblocked": {
+              "type": "boolean",
+              "default": true
+            },
+            "assignee": {
+              "enum": [
+                "me_or_none",
+                "me",
+                "none",
+                "any",
+                false
+              ],
+              "default": "me_or_none"
+            }
+          },
+          "additionalProperties": false
+        },
+        "weights": {
+          "type": "object",
+          "properties": {
+            "priority": {
+              "type": "number",
+              "minimum": 0,
+              "default": 40
+            },
+            "sprint": {
+              "type": "number",
+              "minimum": 0,
+              "default": 25
+            },
+            "epic": {
+              "type": "number",
+              "minimum": 0,
+              "default": 20
+            },
+            "due": {
+              "type": "number",
+              "minimum": 0,
+              "default": 20
+            },
+            "assignee": {
+              "type": "number",
+              "minimum": 0,
+              "default": 10
+            },
+            "age": {
+              "type": "number",
+              "minimum": 0,
+              "default": 5
+            },
+            "labels": {
+              "type": "number",
+              "minimum": 0,
+              "default": 0
+            },
+            "size": {
+              "type": "number",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          "additionalProperties": false
+        },
+        "signals": {
+          "type": "object",
+          "properties": {
+            "priority_map": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "default": {
+                "Highest": 1,
+                "High": 0.75,
+                "Medium": 0.5,
+                "Low": 0.25,
+                "Lowest": 0
+              }
+            },
+            "priority_levels": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 100,
+              "default": 5
+            },
+            "sprint": {
+              "type": "object",
+              "properties": {
+                "active": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 1
+                },
+                "future": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "default": 0.3
+                }
+              },
+              "additionalProperties": false
+            },
+            "label_bonus": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number",
+                "minimum": 0
+              },
+              "default": {}
+            }
+          },
+          "additionalProperties": false
+        },
+        "rerank": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": false
+            },
+            "top_n": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 30,
+              "default": 20
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "source"
+      ]
+    },
+    "hook_entry": {
+      "type": "object",
+      "properties": {
+        "cmd": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "timeout": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 600
+            },
+            {
+              "$ref": "#/$defs/duration"
+            }
+          ],
+          "default": 30
+        },
+        "async": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "cmd"
+      ]
+    },
+    "project_key": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*$",
+      "maxLength": 64
+    },
+    "board_name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+    },
+    "site_name": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "duration": {
+      "type": "string",
+      "pattern": "^[0-9]{1,6}(ms|s|m|h|d|w)$"
+    },
+    "key": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*-[0-9]+$",
+      "maxLength": 64,
+      "description": "Ticket key, printed upper-case."
+    }
+  }
 }

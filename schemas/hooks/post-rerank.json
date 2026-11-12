@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/hooks/post-rerank.json",
+  "title": "post-rerank hook payload (stdin)",
+  "description": "After a re-rank run failed or was skipped for a failure reason. object_id is the board name. Delivered at least once through the outbox; deduplicate on event_id. No ticket text and no repo.",
+  "type": "object",
+  "properties": {
+    "tool": {
+      "const": "ticket-queue"
+    },
+    "hook": {
+      "const": "post-rerank"
+    },
+    "event_id": {
+      "$ref": "../defs.json#/$defs/event_id"
+    },
+    "object_type": {
+      "const": "board"
+    },
+    "object_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+    },
+    "board": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/board_name"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "key": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/key"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "site": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/site_name"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "holder": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/holder"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "labels": {
+      "$ref": "../defs.json#/$defs/claim_labels"
+    },
+    "counts": {
+      "$ref": "../defs.json#/$defs/counts"
+    },
+    "outcome": {
+      "enum": [
+        "failed",
+        "skipped"
+      ]
+    },
+    "reason": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/rerank_reason"
+        },
+        {
+          "$ref": "../defs.json#/$defs/rerank_skip_reason"
+        }
+      ]
+    },
+    "run_id": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/run_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "tool",
+    "hook",
+    "event_id",
+    "object_type",
+    "object_id",
+    "board",
+    "key",
+    "site",
+    "holder",
+    "labels",
+    "counts",
+    "outcome",
+    "reason",
+    "run_id"
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/unpin.json",
+  "title": "unpin --json",
+  "description": "pin is null after a removal.",
+  "type": "object",
+  "properties": {
+    "key": {
+      "$ref": "../defs.json#/$defs/key"
+    },
+    "site": {
+      "$ref": "../defs.json#/$defs/site_name"
+    },
+    "pin": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/pin"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "unchanged": {
+      "type": "boolean"
+    },
+    "pins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "$ref": "../defs.json#/$defs/key"
+          },
+          "site": {
+            "$ref": "../defs.json#/$defs/site_name"
+          },
+          "position": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "site",
+          "position"
+        ]
+      }
+    },
+    "dry_run": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "key",
+    "site",
+    "pin",
+    "unchanged",
+    "pins",
+    "dry_run"
+  ]
+}

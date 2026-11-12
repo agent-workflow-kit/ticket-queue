@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/refresh.json",
+  "title": "refresh --json",
+  "description": "A board whose lease is held by another process reports already_running true. Exit 12 prints this object (partial_results) with details.boards; the error envelope is for a total failure.",
+  "type": "object",
+  "properties": {
+    "mode": {
+      "enum": [
+        "full",
+        "incremental",
+        "mixed"
+      ]
+    },
+    "refreshed_at": {
+      "$ref": "../defs.json#/$defs/refreshed_at"
+    },
+    "stale": {
+      "type": "boolean"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/error_body"
+      }
+    },
+    "boards": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/board_state"
+      }
+    },
+    "dry_run": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "mode",
+    "refreshed_at",
+    "stale",
+    "complete",
+    "errors",
+    "boards",
+    "dry_run"
+  ]
+}
