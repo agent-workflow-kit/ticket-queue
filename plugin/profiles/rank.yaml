@@ -2,7 +2,7 @@
 # `readonly` profile with Agent and Task denied instead of allowed (a ranking needs no sub-agents).
 permissions:
   allow:
-    - "Skill"
+    - "Skill(ticket-queue:rank-tickets)"
   deny:
     - "Agent"
     - "Task"
@@ -13,3 +13,7 @@ permissions:
     - "Bash(glab:*)"
     - "Bash(agent-spawn:*)"
     - "Bash(memoctl add:*)"
+    - "Bash(claude-session report * --summary-file *)"
+    - "Bash(claude-session report * --reason-file *)"
+    - "Bash(*/claude-session report * --summary-file *)"
+    - "Bash(*/claude-session report * --reason-file *)"

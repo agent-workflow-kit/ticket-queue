@@ -93,7 +93,7 @@ rerank:
   max_turns: 12                   # loose safety cap (at least 1)
   timeout: 150s                   # wall-clock bound
 
-hidden:                           # glob lists (* and ?), a hard rule: matching tickets are never shown; no reveal
+hidden:                           # glob lists (* and ?, at most 100 patterns each), a hard rule: matching tickets are never shown; no reveal
   projects: []
   labels: []
 
@@ -103,7 +103,7 @@ browse:
   query: null                     # default query; the TUI writes it to config.d/90-browse-query.yaml next to this file, which overrides this key
 
 cron:
-  env_file: null                  # a user-owned env file sourced by the cron line
+  env_file: null                  # the absolute path of a user-owned env file sourced by the cron line
 
 # Post-hooks only in 0.x. Each entry: cmd (run via sh -c), timeout (1 to 600 seconds or a duration; default 30),
 # async (default false).

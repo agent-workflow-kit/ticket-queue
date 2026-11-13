@@ -423,6 +423,7 @@
         "contended",
         "output_too_large",
         "deadline",
+        "unsafe_block",
         "claimed",
         "done",
         "gone",
@@ -433,7 +434,7 @@
         "rerank_disabled",
         "not_in_pool"
       ],
-      "description": "Exit 2: bad_query, unknown_field, order_by_not_allowed, invalid_config, site_required, claim_required, human_only, too_expensive, invalid_interval, unsafe_path, too_many_labels, result_file_exists. Exit 12: contended, output_too_large, deadline (a ticketctl child killed after 300 seconds). Exit 20: claimed, done, gone, skipped, hidden, holder_mismatch, not_held, rerank_disabled, not_in_pool."
+      "description": "Exit 2: bad_query, unknown_field, order_by_not_allowed, invalid_config, site_required, claim_required, human_only, too_expensive, invalid_interval, unsafe_path, too_many_labels, result_file_exists. Exit 12: contended, output_too_large, deadline (a ticketctl child killed after 300 seconds), unsafe_block (cron uninstall of a block with other lines inside). Exit 20: claimed, done, gone, skipped, hidden, holder_mismatch, not_held, rerank_disabled, not_in_pool."
     },
     "lower_error": {
       "type": "object",
@@ -528,7 +529,9 @@
         "ticket_skipped",
         "weights_differ",
         "pass_env_overlap",
-        "browse_query_invalid"
+        "browse_query_invalid",
+        "orphan_events",
+        "profile_skill_mismatch"
       ],
       "description": "Each code is defined where the interface emits it. soft_rule_overridden: a pin or a named claim overrode a soft rule that failed or was unknown (rule is set). Command-level warnings go in the output's warnings; board warnings (estimate_ambiguous, departures_unchecked, me_unknown) in boards[].warnings."
     },
@@ -679,6 +682,9 @@
         "blocked": {
           "type": "boolean"
         },
+        "dormant": {
+          "type": "boolean"
+        },
         "created_at": {
           "$ref": "#/$defs/ts"
         },
@@ -701,8 +707,10 @@
         "requested_keys",
         "pin_position",
         "expires_at",
-        "blocked"
-      ]
+        "blocked",
+        "dormant"
+      ],
+      "description": "dormant is true for a pin of a ticket that is in no enabled board's pool: it stays stored, is never handed out and is dropped only by expiry, done, gone, unpin or retention."
     },
     "skip": {
       "type": "object",

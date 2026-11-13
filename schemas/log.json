@@ -840,8 +840,7 @@
             "done",
             "gone",
             "expired",
-            "hidden",
-            "left_pool"
+            "retention"
           ]
         }
       },

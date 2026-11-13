@@ -280,7 +280,8 @@
             "minLength": 1,
             "maxLength": 256
           },
-          "default": []
+          "default": [],
+          "maxItems": 100
         },
         "labels": {
           "type": "array",
@@ -289,7 +290,8 @@
             "minLength": 1,
             "maxLength": 256
           },
-          "default": []
+          "default": [],
+          "maxItems": 100
         }
       },
       "additionalProperties": false
@@ -344,7 +346,8 @@
           "oneOf": [
             {
               "type": "string",
-              "minLength": 1
+              "pattern": "^/",
+              "description": "An absolute path."
             },
             {
               "type": "null"
@@ -790,9 +793,20 @@
         "cmd"
       ]
     },
+    "key_input": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*-[0-9]+$",
+      "maxLength": 64,
+      "description": "A ticket key as typed in config: any letter case, stored upper-case."
+    },
     "duration": {
       "type": "string",
       "pattern": "^[0-9]{1,6}(ms|s|m|h|d|w)$"
+    },
+    "project_key": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*$",
+      "maxLength": 64
     },
     "site_name": {
       "type": "string",
@@ -801,17 +815,6 @@
     "board_name": {
       "type": "string",
       "pattern": "^[a-z][a-z0-9_-]{0,63}$"
-    },
-    "project_key": {
-      "type": "string",
-      "pattern": "^[A-Z][A-Z0-9_]*$",
-      "maxLength": 64
-    },
-    "key_input": {
-      "type": "string",
-      "pattern": "^[A-Za-z][A-Za-z0-9_]*-[0-9]+$",
-      "maxLength": 64,
-      "description": "A ticket key as typed in config: any letter case, stored upper-case."
     }
   }
 }

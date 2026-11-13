@@ -13,4 +13,4 @@ Rank the candidate tickets of one board and write the result as `ranking.json`.
 4. Rank the candidates against the board's goals, its prioritized epics and the deterministic scores. Every candidate key must appear exactly once, in `ranking` (best first) or in `excluded`. Invent no key. Keep each `reason` to 200 characters or fewer.
 5. Write `ranking.json` with the Write tool into the session's artifacts directory. It must match the schema in the prompt file exactly: `schema_version` 1, `run_id` copied from the prompt, `ranking`, optionally `excluded`, and `skill_marker`.
 6. Set `skill_marker` by reading `references/marker.md` of this skill with the Read tool and copying its single line unchanged, without the trailing newline.
-7. Write a one-line summary of the ranking to a file in the artifacts directory, as the prompt file directs.
+7. Report only as the prompt file directs, with its one-line command and an inline summary; do not write a summary file.
