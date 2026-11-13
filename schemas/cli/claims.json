@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/claims.json",
+  "title": "claims --json",
+  "description": "Live claims ordered by claimed_at (hidden entries included, in the same order), with their ticket state. count includes hidden entries.",
+  "type": "object",
+  "properties": {
+    "claims": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "site": {
+                "$ref": "../defs.json#/$defs/site_name"
+              },
+              "key": {
+                "$ref": "../defs.json#/$defs/key"
+              },
+              "requested_keys": {
+                "$ref": "../defs.json#/$defs/requested_keys"
+              },
+              "board": {
+                "oneOf": [
+                  {
+                    "$ref": "../defs.json#/$defs/board_name"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "holder": {
+                "oneOf": [
+                  {
+                    "$ref": "../defs.json#/$defs/holder"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "labels": {
+                "$ref": "../defs.json#/$defs/claim_labels"
+              },
+              "claimed_at": {
+                "$ref": "../defs.json#/$defs/ts"
+              },
+              "renewed_at": {
+                "$ref": "../defs.json#/$defs/ts"
+              },
+              "expires_at": {
+                "$ref": "../defs.json#/$defs/ts"
+              },
+              "expires_in_s": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "ttl_s": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "ticket_state": {
+                "$ref": "../defs.json#/$defs/claim_state"
+              },
+              "ticket": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "maxLength": 4096,
+                    "x-untrusted": true
+                  },
+                  "status": {
+                    "$ref": "../defs.json#/$defs/status"
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri",
+                    "maxLength": 2048
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "title",
+                  "status",
+                  "url"
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "site",
+              "key",
+              "requested_keys",
+              "board",
+              "holder",
+              "labels",
+              "claimed_at",
+              "renewed_at",
+              "expires_at",
+              "expires_in_s",
+              "ttl_s",
+              "ticket_state",
+              "ticket"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "site": {
+                "$ref": "../defs.json#/$defs/site_name"
+              },
+              "key": {
+                "$ref": "../defs.json#/$defs/key"
+              },
+              "requested_keys": {
+                "$ref": "../defs.json#/$defs/requested_keys"
+              },
+              "hidden": {
+                "const": true
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "site",
+              "key",
+              "requested_keys",
+              "hidden"
+            ],
+            "description": "A hidden claimed ticket: its keys only."
+          }
+        ]
+      }
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
+    "refreshed_at": {
+      "$ref": "../defs.json#/$defs/refreshed_at"
+    },
+    "stale": {
+      "type": "boolean"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/error_body"
+      }
+    },
+    "boards": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/board_state"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "claims",
+    "count",
+    "warnings",
+    "refreshed_at",
+    "stale",
+    "complete",
+    "errors",
+    "boards"
+  ]
+}

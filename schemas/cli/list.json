@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/list.json",
+  "title": "list --json",
+  "description": "Candidates in order (or, with --all, every ticket of the selected pools). empty is true when nothing matched (exit 0; list never exits 22). count is the number printed; total the number matching after the query and before --limit. description is never printed by list.",
+  "type": "object",
+  "properties": {
+    "tickets": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/ticket"
+      }
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000
+    },
+    "empty": {
+      "type": "boolean"
+    },
+    "query": {
+      "oneOf": [
+        {
+          "type": "string",
+          "maxLength": 1000,
+          "x-untrusted": true
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "rerank": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+      },
+      "additionalProperties": {
+        "$ref": "../defs.json#/$defs/rerank_summary"
+      },
+      "description": "Per board: whether a result applied, its age, expiry."
+    },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
+    "refreshed_at": {
+      "$ref": "../defs.json#/$defs/refreshed_at"
+    },
+    "stale": {
+      "type": "boolean"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/error_body"
+      }
+    },
+    "boards": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/board_state"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "tickets",
+    "count",
+    "total",
+    "limit",
+    "empty",
+    "query",
+    "rerank",
+    "warnings",
+    "refreshed_at",
+    "stale",
+    "complete",
+    "errors",
+    "boards"
+  ]
+}

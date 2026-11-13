@@ -1,0 +1,19 @@
+# Permission profile for ticket-queue's bundled re-rank run: a copy of claude-session's built-in
+# `readonly` profile with Agent and Task denied instead of allowed (a ranking needs no sub-agents).
+permissions:
+  allow:
+    - "Skill(ticket-queue:rank-tickets)"
+  deny:
+    - "Agent"
+    - "Task"
+    - "WebFetch"
+    - "WebSearch"
+    - "mcp__*"
+    - "Bash(gh:*)"
+    - "Bash(glab:*)"
+    - "Bash(agent-spawn:*)"
+    - "Bash(memoctl add:*)"
+    - "Bash(claude-session report * --summary-file *)"
+    - "Bash(claude-session report * --reason-file *)"
+    - "Bash(*/claude-session report * --summary-file *)"
+    - "Bash(*/claude-session report * --reason-file *)"

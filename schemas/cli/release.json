@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/release.json",
+  "title": "release --json",
+  "description": "Idempotent: unchanged true when the ticket was not claimed. site is null only when unchanged is true and no store holds a claim for the key. auto_skip is the skip created when claim.max_failures was reached.",
+  "type": "object",
+  "properties": {
+    "key": {
+      "$ref": "../defs.json#/$defs/key"
+    },
+    "site": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/site_name"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "requested_keys": {
+      "$ref": "../defs.json#/$defs/requested_keys"
+    },
+    "released": {
+      "type": "boolean"
+    },
+    "unchanged": {
+      "type": "boolean"
+    },
+    "failed": {
+      "type": "boolean"
+    },
+    "forced": {
+      "type": "boolean"
+    },
+    "consecutive_failures": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "auto_skip": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/skip"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
+    "dry_run": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "key",
+    "site",
+    "requested_keys",
+    "released",
+    "unchanged",
+    "failed",
+    "forced",
+    "consecutive_failures",
+    "auto_skip",
+    "warnings",
+    "dry_run"
+  ],
+  "if": {
+    "properties": {
+      "unchanged": {
+        "const": false
+      }
+    },
+    "required": [
+      "unchanged"
+    ]
+  },
+  "then": {
+    "properties": {
+      "site": {
+        "$ref": "../defs.json#/$defs/site_name"
+      }
+    }
+  }
+}

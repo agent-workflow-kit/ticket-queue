@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/rerank.json",
+  "title": "rerank --json",
+  "description": "Per board result. With --dry-run inputs holds the input documents that would be given to the command and nothing is called. Ticket text appears only in inputs (untrusted). Some boards failed: exit 12 with this object; all selected boards failed: exit 12 error envelope rerank_failed with details.results.",
+  "type": "object",
+  "properties": {
+    "results": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/rerank_result"
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "$ref": "../rerank-input.json"
+      }
+    },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/error_body"
+      }
+    },
+    "boards": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/board_state"
+      }
+    },
+    "dry_run": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "results",
+    "warnings",
+    "complete",
+    "errors",
+    "boards",
+    "dry_run"
+  ]
+}

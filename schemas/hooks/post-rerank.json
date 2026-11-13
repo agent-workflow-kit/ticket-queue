@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/hooks/post-rerank.json",
+  "title": "post-rerank hook payload (stdin)",
+  "description": "After a re-rank run failed. object_id is the board name. Delivered at least once through the outbox; deduplicate on event_id; delivery order is not guaranteed, order by seq. Consumers tolerate unknown keys. No ticket text and no repo.",
+  "type": "object",
+  "properties": {
+    "tool": {
+      "const": "ticket-queue"
+    },
+    "hook": {
+      "const": "post-rerank"
+    },
+    "event_id": {
+      "$ref": "../defs.json#/$defs/event_id"
+    },
+    "event_ts": {
+      "$ref": "../defs.json#/$defs/ts"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic per store; consumers order by seq."
+    },
+    "object_type": {
+      "const": "board"
+    },
+    "object_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._:-]{1,128}$",
+      "description": "<site>:<KEY> for a ticket, the board name for a board."
+    },
+    "board": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/board_name"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "key": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/key"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "site": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/site_name"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "holder": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/holder"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "labels": {
+      "$ref": "../defs.json#/$defs/claim_labels"
+    },
+    "requested_keys": {
+      "$ref": "../defs.json#/$defs/requested_keys"
+    },
+    "outcome": {
+      "const": "failed"
+    },
+    "reason": {
+      "$ref": "../defs.json#/$defs/rerank_reason"
+    },
+    "run_id": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/run_id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "tool",
+    "hook",
+    "event_id",
+    "event_ts",
+    "seq",
+    "object_type",
+    "object_id",
+    "board",
+    "key",
+    "site",
+    "holder",
+    "labels",
+    "requested_keys",
+    "outcome",
+    "reason",
+    "run_id"
+  ]
+}

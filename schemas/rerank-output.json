@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/rerank-output.json",
+  "title": "Re-rank output document (stdout of a custom command; ranking.json of the bundled implementation)",
+  "description": "Exactly these keys. ranking plus excluded must equal the candidate key set exactly. The document is at most 32 KiB (a limit JSON Schema cannot express; ticket-queue checks it before parsing). A reason longer than 200 characters is cut by ticket-queue, not rejected (maxLength is the author's contract). skill_marker follows the marker rule of the interface (the key set below allows it; ticket-queue enforces presence).",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "run_id": {
+      "$ref": "defs.json#/$defs/run_id"
+    },
+    "ranking": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "$ref": "defs.json#/$defs/key"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 200,
+            "x-untrusted": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "reason"
+        ]
+      },
+      "maxItems": 30
+    },
+    "excluded": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "$ref": "defs.json#/$defs/key"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 200,
+            "x-untrusted": true
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "reason"
+        ]
+      },
+      "maxItems": 30
+    },
+    "skill_marker": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{1,128}$",
+      "description": "Present and equal to the effective rerank.marker when the bundled implementation runs with a marker; absent when the marker is null; a custom rerank.command must not print it."
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "ranking"
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/next.json",
+  "title": "next --json",
+  "description": "The top eligible ticket. With no candidate (exit 22) empty is true and ticket null. passed_over lists tickets that failed the live re-check under --claim. claim is the written claim with --claim, else null. refresh holds the per-board results when --refresh ran (a partial refresh with a candidate is exit 0 with warning refresh_partial).",
+  "type": "object",
+  "properties": {
+    "empty": {
+      "type": "boolean"
+    },
+    "ticket": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/ticket"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "claim": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/claim"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "passed_over": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "$ref": "../defs.json#/$defs/key"
+          },
+          "site": {
+            "$ref": "../defs.json#/$defs/site_name"
+          },
+          "requested_keys": {
+            "$ref": "../defs.json#/$defs/requested_keys"
+          },
+          "outcome": {
+            "const": "claim_skipped"
+          },
+          "reason": {
+            "enum": [
+              "done",
+              "gone",
+              "hidden",
+              "claimed",
+              "skipped",
+              "status",
+              "pointed",
+              "sprint",
+              "unblocked",
+              "assignee",
+              "parent",
+              "read_failed"
+            ],
+            "description": "The failing rule's name, gone for a ticket not found, or read_failed for any other per-key error."
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "site",
+          "requested_keys",
+          "outcome",
+          "reason"
+        ]
+      }
+    },
+    "refresh": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "../defs.json#/$defs/board_state"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
+    "refreshed_at": {
+      "$ref": "../defs.json#/$defs/refreshed_at"
+    },
+    "stale": {
+      "type": "boolean"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/error_body"
+      }
+    },
+    "boards": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/board_state"
+      }
+    },
+    "dry_run": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "empty",
+    "ticket",
+    "claim",
+    "passed_over",
+    "warnings",
+    "refreshed_at",
+    "stale",
+    "complete",
+    "errors",
+    "boards",
+    "dry_run"
+  ]
+}

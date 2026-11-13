@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/cron-install.json",
+  "title": "cron install --json",
+  "description": "The crontab block that was (or with --dry-run would be) written.",
+  "type": "object",
+  "properties": {
+    "installed": {
+      "type": "boolean"
+    },
+    "changed": {
+      "type": "boolean"
+    },
+    "interval": {
+      "$ref": "../defs.json#/$defs/cron_interval"
+    },
+    "block": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 4096
+      }
+    },
+    "dry_run": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "installed",
+    "changed",
+    "interval",
+    "block",
+    "dry_run"
+  ]
+}

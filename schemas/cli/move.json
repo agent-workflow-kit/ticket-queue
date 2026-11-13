@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/move.json",
+  "title": "move --json",
+  "description": "Reorders within the pin list; pinned_first is true when the ticket was pinned by this command.",
+  "type": "object",
+  "properties": {
+    "key": {
+      "$ref": "../defs.json#/$defs/key"
+    },
+    "site": {
+      "$ref": "../defs.json#/$defs/site_name"
+    },
+    "requested_keys": {
+      "$ref": "../defs.json#/$defs/requested_keys"
+    },
+    "pin": {
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/pin"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "unchanged": {
+      "type": "boolean"
+    },
+    "pins": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "$ref": "../defs.json#/$defs/key"
+          },
+          "site": {
+            "$ref": "../defs.json#/$defs/site_name"
+          },
+          "pin_position": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "site",
+          "pin_position"
+        ]
+      }
+    },
+    "pinned_first": {
+      "type": "boolean"
+    },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
+    "dry_run": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "key",
+    "site",
+    "requested_keys",
+    "pin",
+    "unchanged",
+    "pins",
+    "pinned_first",
+    "warnings",
+    "dry_run"
+  ]
+}

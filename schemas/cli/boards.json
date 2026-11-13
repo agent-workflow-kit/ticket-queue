@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/boards.json",
+  "title": "boards --json",
+  "description": "The configured boards in config order and their state. Always exit 0. undelivered_events counts outbox events not yet delivered.",
+  "type": "object",
+  "properties": {
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "undelivered_events": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
+    "refreshed_at": {
+      "$ref": "../defs.json#/$defs/refreshed_at"
+    },
+    "stale": {
+      "type": "boolean"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/error_body"
+      }
+    },
+    "boards": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/board_state"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "count",
+    "undelivered_events",
+    "warnings",
+    "refreshed_at",
+    "stale",
+    "complete",
+    "errors",
+    "boards"
+  ]
+}

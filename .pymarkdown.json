@@ -13,6 +13,9 @@
     },
     "md033": {
       "enabled": false
+    },
+    "md041": {
+      "enabled": false
     }
   }
 }

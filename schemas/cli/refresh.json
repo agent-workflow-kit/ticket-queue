@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/refresh.json",
+  "title": "refresh --json",
+  "description": "mode is full or incremental when every board that ran used that mode, mixed otherwise, null when no board ran. rerank (optional) holds the per-board re-rank results when --rerank was given or the automatic step ran (a skipped step reports rerank_disabled). A board whose lease is held by another process reports already_running true. Exit 12 prints this object (partial_results) when a board is refresh_failed, truncated or disabled; the error envelope is for a total failure.",
+  "type": "object",
+  "properties": {
+    "mode": {
+      "oneOf": [
+        {
+          "enum": [
+            "full",
+            "incremental",
+            "mixed"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "rerank": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/rerank_result"
+      }
+    },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/error_body"
+      }
+    },
+    "boards": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/board_state"
+      }
+    },
+    "dry_run": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "mode",
+    "warnings",
+    "complete",
+    "errors",
+    "boards",
+    "dry_run"
+  ]
+}

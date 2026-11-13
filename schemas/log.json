@@ -1,33 +1,1187 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "ticket-queue/log",
+  "$id": "ticket-queue/log.json",
   "title": "ticket-queue log.jsonl record",
-  "type": "object",
-  "properties": {
-    "ts": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "level": {
-      "type": "string",
-      "enum": [
-        "debug",
-        "info",
-        "warn",
-        "error"
+  "description": "Public operational log, one record per line (export prints these lines). No ticket text beyond keys (a skip reason is recorded as a byte count). A lapsed claim is a release record with reason lapsed. level is optional; decision_ids appear only in the log (there is no audit file).",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "refresh"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "board": {
+          "$ref": "defs.json#/$defs/board_name"
+        },
+        "status": {
+          "$ref": "defs.json#/$defs/board_status"
+        },
+        "mode": {
+          "enum": [
+            "full",
+            "incremental"
+          ]
+        },
+        "counts": {
+          "$ref": "defs.json#/$defs/counts"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "error_code": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/error_code"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "board",
+        "status",
+        "counts",
+        "duration_ms"
       ]
     },
-    "event": {
-      "type": "string"
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "claim"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "board": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/board_name"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "holder": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/holder"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "renewed": {
+          "type": "boolean"
+        },
+        "expires_at": {
+          "$ref": "defs.json#/$defs/ts"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "key",
+        "site",
+        "requested_keys",
+        "renewed",
+        "expires_at"
+      ]
     },
-    "message": {
-      "type": "string"
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "release"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "tty": {
+          "type": "boolean",
+          "description": "Whether stdin was a terminal."
+        },
+        "board": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/board_name"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "holder": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/holder"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "failed": {
+          "type": "boolean"
+        },
+        "forced": {
+          "type": "boolean"
+        },
+        "reason": {
+          "$ref": "defs.json#/$defs/release_reason"
+        },
+        "consecutive_failures": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "key",
+        "site",
+        "requested_keys",
+        "failed",
+        "reason"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "auto_skip"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "failures": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "key",
+        "site",
+        "requested_keys",
+        "failures"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "pin"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "tty": {
+          "type": "boolean",
+          "description": "Whether stdin was a terminal."
+        },
+        "pin_position": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "expires_at": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/ts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "key",
+        "site",
+        "requested_keys",
+        "pin_position"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "unpin"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "tty": {
+          "type": "boolean",
+          "description": "Whether stdin was a terminal."
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "key",
+        "site",
+        "requested_keys"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "move"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "tty": {
+          "type": "boolean",
+          "description": "Whether stdin was a terminal."
+        },
+        "from": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "to": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "key",
+        "site",
+        "requested_keys",
+        "to"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "skip"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "tty": {
+          "type": "boolean",
+          "description": "Whether stdin was a terminal."
+        },
+        "source": {
+          "enum": [
+            "human",
+            "auto"
+          ]
+        },
+        "until": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/ts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "key",
+        "site",
+        "requested_keys",
+        "source"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "unskip"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "tty": {
+          "type": "boolean",
+          "description": "Whether stdin was a terminal."
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "key",
+        "site",
+        "requested_keys"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "pin_dropped"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "key": {
+          "$ref": "defs.json#/$defs/key"
+        },
+        "site": {
+          "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "reason": {
+          "enum": [
+            "done",
+            "gone",
+            "expired",
+            "retention"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "key",
+        "site",
+        "requested_keys",
+        "reason"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "rerank"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "board": {
+          "$ref": "defs.json#/$defs/board_name"
+        },
+        "outcome": {
+          "enum": [
+            "ok",
+            "failed"
+          ]
+        },
+        "reason": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/rerank_reason"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "run_id": {
+          "oneOf": [
+            {
+              "$ref": "defs.json#/$defs/run_id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "duration_ms": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cost_usd": {
+          "oneOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sandbox_active": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "candidates_dropped": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "board",
+        "outcome"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "rerank_skipped"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "board": {
+          "$ref": "defs.json#/$defs/board_name"
+        },
+        "reason": {
+          "$ref": "defs.json#/$defs/rerank_skip_reason"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "board",
+        "reason"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "prune"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "dry_run": {
+          "type": "boolean"
+        },
+        "counts": {
+          "$ref": "defs.json#/$defs/counts"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "counts"
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "event": {
+          "const": "hook_failed"
+        },
+        "v": {
+          "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
+        "ts": {
+          "$ref": "defs.json#/$defs/ts"
+        },
+        "level": {
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ]
+        },
+        "actor": {
+          "$ref": "defs.json#/$defs/actor"
+        },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default",
+            "tui",
+            "system"
+          ],
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
+        },
+        "decision_ids": {
+          "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
+        },
+        "hook": {
+          "$ref": "defs.json#/$defs/hook_name"
+        },
+        "attempts": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "final": {
+          "type": "boolean"
+        },
+        "exit": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timed_out": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "event",
+        "seq",
+        "ts",
+        "actor",
+        "actor_source",
+        "decision_ids",
+        "hook",
+        "event_id",
+        "attempts",
+        "final"
+      ]
     }
-  },
-  "required": [
-    "ts",
-    "level",
-    "event"
-  ],
-  "additionalProperties": true
+  ]
 }

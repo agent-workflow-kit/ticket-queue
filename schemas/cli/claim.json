@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ticket-queue/cli/claim.json",
+  "title": "claim --json",
+  "description": "renewed is true when the caller already held a live claim. Soft-rule failures are warnings; a renewal of a done or skipped ticket warns ticket_done or ticket_skipped.",
+  "type": "object",
+  "properties": {
+    "ticket": {
+      "$ref": "../defs.json#/$defs/ticket"
+    },
+    "claim": {
+      "$ref": "../defs.json#/$defs/claim"
+    },
+    "renewed": {
+      "type": "boolean"
+    },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
+    "complete": {
+      "type": "boolean"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "../defs.json#/$defs/error_body"
+      }
+    },
+    "dry_run": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "ticket",
+    "claim",
+    "renewed",
+    "warnings",
+    "complete",
+    "errors",
+    "dry_run"
+  ]
+}
