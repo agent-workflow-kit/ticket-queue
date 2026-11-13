@@ -49,6 +49,9 @@
       },
       "description": "Per board: whether a result applied, its age, expiry."
     },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
     "refreshed_at": {
       "$ref": "../defs.json#/$defs/refreshed_at"
     },
@@ -80,6 +83,7 @@
     "empty",
     "query",
     "rerank",
+    "warnings",
     "refreshed_at",
     "stale",
     "complete",

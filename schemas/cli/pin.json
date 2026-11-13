@@ -11,6 +11,9 @@
     "site": {
       "$ref": "../defs.json#/$defs/site_name"
     },
+    "requested_keys": {
+      "$ref": "../defs.json#/$defs/requested_keys"
+    },
     "pin": {
       "oneOf": [
         {
@@ -48,6 +51,9 @@
         ]
       }
     },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
     "dry_run": {
       "type": "boolean"
     }
@@ -56,9 +62,11 @@
   "required": [
     "key",
     "site",
+    "requested_keys",
     "pin",
     "unchanged",
     "pins",
+    "warnings",
     "dry_run"
   ]
 }

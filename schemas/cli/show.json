@@ -8,6 +8,9 @@
     "ticket": {
       "$ref": "../defs.json#/$defs/ticket_full"
     },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
     "refreshed_at": {
       "$ref": "../defs.json#/$defs/refreshed_at"
     },
@@ -27,6 +30,7 @@
   "additionalProperties": false,
   "required": [
     "ticket",
+    "warnings",
     "refreshed_at",
     "stale",
     "complete",

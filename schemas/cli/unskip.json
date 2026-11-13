@@ -2,14 +2,24 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-queue/cli/unskip.json",
   "title": "unskip --json",
-  "description": "Idempotent: unchanged true when no skip was active.",
+  "description": "Idempotent: unchanged true when no skip was active. site is null only when unchanged is true and no store holds a skip for the key.",
   "type": "object",
   "properties": {
     "key": {
       "$ref": "../defs.json#/$defs/key"
     },
     "site": {
-      "$ref": "../defs.json#/$defs/site_name"
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/site_name"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "requested_keys": {
+      "$ref": "../defs.json#/$defs/requested_keys"
     },
     "ended": {
       "oneOf": [
@@ -24,6 +34,9 @@
     "unchanged": {
       "type": "boolean"
     },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
     "dry_run": {
       "type": "boolean"
     }
@@ -32,8 +45,27 @@
   "required": [
     "key",
     "site",
+    "requested_keys",
     "ended",
     "unchanged",
+    "warnings",
     "dry_run"
-  ]
+  ],
+  "if": {
+    "properties": {
+      "unchanged": {
+        "const": false
+      }
+    },
+    "required": [
+      "unchanged"
+    ]
+  },
+  "then": {
+    "properties": {
+      "site": {
+        "$ref": "../defs.json#/$defs/site_name"
+      }
+    }
+  }
 }

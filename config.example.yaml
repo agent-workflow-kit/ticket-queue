@@ -1,11 +1,13 @@
 # Example config for ticket-queue.
 # Location: ~/.config/ticket-queue/config.yaml (respects XDG_CONFIG_HOME); drop-ins in config.d/*.yaml merge in
-# lexical order after it (maps merge, hook lists append). Every key below is shown with its default unless noted.
+# lexical order after it (maps merge, hook lists append, every other list replaces). Every key below is shown with its default unless noted.
 # Durations are strings such as 30m, 24h, 7d (units ms, s, m, h, d, w).
-# Environment: scalars can be set as TICKET_QUEUE_<KEY>, nested keys joined with __ (TICKET_QUEUE_REFRESH__STALE_AFTER).
+# Environment: scalars can be set as TICKET_QUEUE_<KEY>, nested keys joined with __ (TICKET_QUEUE_REFRESH__STALE_AFTER);
+# a value from the environment is parsed as a YAML scalar (true, 5, 30m).
+# The YAML is loaded safely: no anchors, aliases or duplicate mapping keys.
 
 me:
-  name: sam                       # actor name (also the TUI holder suffix); default: the OS username
+  name: sam                       # actor name (also the TUI holder suffix); default: the OS username with characters outside [A-Za-z0-9._@-] replaced by _ (at most 64)
 
 ticketctl:
   config: null                    # an explicit ticketctl --config path
@@ -19,7 +21,7 @@ claude_session:
 # several pools belongs to the first board, in that order, whose pool holds it.
 boards:
   main:
-    enabled: true                 # false: the board is ignored and loses its member rows at the next refresh or prune
+    enabled: true                 # false excludes the board (status excluded): never refreshed or selected, owns no ticket
     site: example                 # default: ticketctl.default_site; a board with neither is a config error
     source:                       # required: a ticketctl named query ...
       query: my-open-work
@@ -45,7 +47,7 @@ boards:
       size: 0
     signals:
       priority_map: {Highest: 1, High: 0.75, Medium: 0.5, Low: 0.25, Lowest: 0}   # entries overlay the defaults per name; values 0 to 1
-      priority_levels: 5          # at least 2
+      priority_levels: 5          # 2 to 100
       sprint: {active: 1, future: 0.3}
       label_bonus: {}             # label -> bonus 0 to 1, summed and capped at 1
     rerank:
@@ -63,19 +65,19 @@ claim:
   max_ttl: 30d                    # upper bound for --ttl
   max_failures: 3                 # consecutive failed releases before an auto-skip
   dead_grace: 7d                  # age of a done or gone claimed ticket before prune releases the claim
-  scan_limit: 20                  # next --claim live-checks at most this many candidates
+  scan_limit: 20                  # next --claim examines at most this many candidates (1 to 100)
 
 refresh:
   stale_after: 30m                # pool age shown as stale
   full_every: 24h                 # full rebuild interval
   overlap: 5m                     # incremental refresh overlap
-  max_pages: 20                   # pages per board and refresh
+  max_pages: 20                   # pages per board and refresh (1 to 1000)
 
 rerank:
   enabled: false                  # the global re-rank switch
   command: null                   # a custom argv list (no shell); null is the bundled implementation
   skill: "ticket-queue:rank-tickets"
-  # marker: the bundled marker value by default; null disables the marker check (needed by a custom skill)
+  # marker: the bundled marker value by default (default null for a custom skill or plugin_dir); null disables the marker check
   model: haiku
   top_n: 20                       # candidates given (at most 30)
   description_chars: 1000         # description cut per candidate (at most 1000)
@@ -85,10 +87,10 @@ rerank:
   auto: false                     # run after each refresh when the input changed
   permission_profile: null        # a profile file replacing the bundled plugin/profiles/rank.yaml
   plugin_dir: null                # a custom plugin directory (null: the bundled plugin)
-  sandbox: preferred              # required or preferred (off is accepted only with a custom command)
+  sandbox: preferred              # required or preferred; unused by a custom rerank.command
   setting_sources: []             # passed with --setting-sources (user, project, local)
   env_allowlist: [PATH]           # passed with --env-allowlist-only
-  max_turns: 12                   # loose safety cap
+  max_turns: 12                   # loose safety cap (at least 1)
   timeout: 150s                   # wall-clock bound
 
 hidden:                           # glob lists (* and ?), a hard rule: matching tickets are never shown; no reveal
@@ -98,7 +100,7 @@ hidden:                           # glob lists (* and ?), a hard rule: matching 
 browse:
   refresh_interval: 120s          # automatic refresh in the TUI; 0 turns it off
   detail_collapsed: []            # facts, description, score, links, comments, history
-  query: null                     # default query; the TUI writes it to config.d/90-browse-query.yaml, which overrides this key
+  query: null                     # default query; the TUI writes it to config.d/90-browse-query.yaml next to this file, which overrides this key
 
 cron:
   env_file: null                  # a user-owned env file sourced by the cron line

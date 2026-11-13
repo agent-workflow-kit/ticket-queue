@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-queue/config.json",
   "title": "ticket-queue config",
-  "description": "Config file (config.yaml plus config.d drop-ins merged). Self-contained: no external $ref. Environment variables can set top-level and nested scalars only (TICKET_QUEUE_<KEY>, nested keys joined with __).",
+  "description": "Config file (config.yaml plus config.d drop-ins merged: maps merge, hook lists append, every other list replaces). YAML is loaded with a safe loader that rejects anchors, aliases and duplicate mapping keys. Self-contained: no external $ref. Environment variables can set top-level and nested scalars only (TICKET_QUEUE_<KEY>, nested keys joined with __).",
   "type": "object",
   "properties": {
     "me": {
@@ -167,7 +167,8 @@
             {
               "type": "null"
             }
-          ]
+          ],
+          "description": "Absent: the bundled reference value when rerank.skill is the default and rerank.plugin_dir is null, else null (the check is then the run id only)."
         },
         "model": {
           "type": "string",
@@ -229,11 +230,10 @@
         "sandbox": {
           "enum": [
             "required",
-            "preferred",
-            "off"
+            "preferred"
           ],
           "default": "preferred",
-          "description": "off is accepted only with a custom rerank.command (see the allOf below)."
+          "description": "Unused by a custom rerank.command."
         },
         "setting_sources": {
           "type": "array",
@@ -268,32 +268,7 @@
           "default": "150s"
         }
       },
-      "additionalProperties": false,
-      "allOf": [
-        {
-          "if": {
-            "properties": {
-              "command": {
-                "type": "array"
-              }
-            },
-            "required": [
-              "command"
-            ]
-          },
-          "then": {},
-          "else": {
-            "properties": {
-              "sandbox": {
-                "enum": [
-                  "required",
-                  "preferred"
-                ]
-              }
-            }
-          }
-        }
-      ]
+      "additionalProperties": false
     },
     "hidden": {
       "type": "object",
@@ -465,7 +440,8 @@
         },
         "enabled": {
           "type": "boolean",
-          "default": true
+          "default": true,
+          "description": "false excludes the board (status excluded): never refreshed or selected, owns no ticket."
         },
         "source": {
           "oneOf": [
@@ -814,28 +790,28 @@
         "cmd"
       ]
     },
-    "board_name": {
-      "type": "string",
-      "pattern": "^[a-z][a-z0-9_-]{0,63}$"
-    },
-    "key_input": {
-      "type": "string",
-      "pattern": "^[A-Za-z][A-Za-z0-9_]*-[0-9]+$",
-      "maxLength": 64,
-      "description": "A ticket key as typed in config: any letter case, stored upper-case."
-    },
     "duration": {
       "type": "string",
       "pattern": "^[0-9]{1,6}(ms|s|m|h|d|w)$"
+    },
+    "site_name": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+    },
+    "board_name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{0,63}$"
     },
     "project_key": {
       "type": "string",
       "pattern": "^[A-Z][A-Z0-9_]*$",
       "maxLength": 64
     },
-    "site_name": {
+    "key_input": {
       "type": "string",
-      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*-[0-9]+$",
+      "maxLength": 64,
+      "description": "A ticket key as typed in config: any letter case, stored upper-case."
     }
   }
 }

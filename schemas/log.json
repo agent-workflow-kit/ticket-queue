@@ -35,9 +35,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
@@ -120,9 +122,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
@@ -179,6 +183,7 @@
         "decision_ids",
         "key",
         "site",
+        "requested_keys",
         "renewed",
         "expires_at"
       ]
@@ -214,9 +219,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
@@ -284,6 +291,7 @@
         "decision_ids",
         "key",
         "site",
+        "requested_keys",
         "failed",
         "reason"
       ]
@@ -319,9 +327,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
@@ -356,6 +366,7 @@
         "decision_ids",
         "key",
         "site",
+        "requested_keys",
         "failures"
       ]
     },
@@ -390,9 +401,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
@@ -441,6 +454,7 @@
         "decision_ids",
         "key",
         "site",
+        "requested_keys",
         "pin_position"
       ]
     },
@@ -475,9 +489,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
@@ -511,7 +527,8 @@
         "actor_source",
         "decision_ids",
         "key",
-        "site"
+        "site",
+        "requested_keys"
       ]
     },
     {
@@ -545,9 +562,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
@@ -590,6 +609,7 @@
         "decision_ids",
         "key",
         "site",
+        "requested_keys",
         "to"
       ]
     },
@@ -624,9 +644,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
@@ -681,6 +703,7 @@
         "decision_ids",
         "key",
         "site",
+        "requested_keys",
         "source"
       ]
     },
@@ -715,9 +738,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
@@ -751,7 +776,8 @@
         "actor_source",
         "decision_ids",
         "key",
-        "site"
+        "site",
+        "requested_keys"
       ]
     },
     {
@@ -785,9 +811,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
@@ -811,7 +839,9 @@
           "enum": [
             "done",
             "gone",
-            "expired"
+            "expired",
+            "hidden",
+            "left_pool"
           ]
         }
       },
@@ -825,6 +855,7 @@
         "decision_ids",
         "key",
         "site",
+        "requested_keys",
         "reason"
       ]
     },
@@ -859,9 +890,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
@@ -978,9 +1011,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
@@ -1038,9 +1073,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
@@ -1097,9 +1134,11 @@
         "actor_source": {
           "enum": [
             "flag",
-            "default"
+            "default",
+            "tui",
+            "system"
           ],
-          "description": "flag: --actor was given; default: derived."
+          "description": "flag: --actor was given; default: derived; tui: a TUI action; system: a record the tool causes itself (actor auto:ticket-queue)."
         },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"

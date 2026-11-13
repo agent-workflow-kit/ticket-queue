@@ -13,6 +13,9 @@
       "type": "integer",
       "minimum": 0
     },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
     "refreshed_at": {
       "$ref": "../defs.json#/$defs/refreshed_at"
     },
@@ -39,6 +42,7 @@
   "required": [
     "count",
     "undelivered_events",
+    "warnings",
     "refreshed_at",
     "stale",
     "complete",

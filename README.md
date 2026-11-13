@@ -17,7 +17,7 @@ L2 (composite). Works fully standalone; it does not need the `awkit` harness, tm
 - Scores eligible tickets deterministically from configurable weights (priority, sprint, prioritized epics, due date, assignee, age, labels, size). `why KEY` explains every term.
 - Optionally lets a model re-rank the top of the list against per-board goals, through the bundled `rank-tickets` skill run headless via claude-session (or any command you configure). A bad or missing result never changes the deterministic order.
 - Applies manual pins, moves and skips, which always win over scores and re-rank (a pin never overrides a hard rule: done, gone, hidden, claimed, skipped).
-- Claims: `next --claim` and `claim KEY` reserve a ticket so it is not handed out twice; a claim is held until `release`, with a TTL only for claims that are not renewed (a holder's renewal survives a ticket that became done or skipped, with a warning). `release KEY --failed` records a failed start; after N consecutive failed releases the ticket is auto-skipped and a hook fires. A claim is local: ticket-queue never writes to the ticket system.
+- Claims: `next --claim` and `claim KEY` reserve a ticket so it is not handed out twice; a claim is held until `release`, with a TTL only for claims that are not renewed (a holder's renewal survives a ticket that became done or skipped, with a warning); `next --claim` is not idempotent, so after an unknown outcome run `claims --holder H`. `release KEY --failed` records a failed start; after N consecutive failed releases the ticket is auto-skipped and a hook fires. A claim is local: ticket-queue never writes to the ticket system.
 - A query language (`list --query`, `next --query`, the TUI panel) shared by the CLI and the terminal UI.
 - An optional terminal UI, `browse`, with a query panel, pins, moves, skips, claims and a detail pane.
 
@@ -33,7 +33,7 @@ Specified in [docs/interface.md](docs/interface.md#commands).
 - `ticket-queue rerank`
 - `ticket-queue boards`, `validate [--probe]`, `cron install|uninstall`, `export`, `prune`, `browse`
 
-Exit codes follow the design guide. The tool-specific code is 22: `next` found no eligible candidate (`list` always exits 0 and reports `empty`). Errors carry a closed `error.code` per exit (`invalid_argument`, `not_found`, `partial_results`, `lower_failed`, `refused`, `ambiguous_key` and others) and a separate `error.reason` such as `claimed`, `done`, `gone`, `skipped`, `hidden`, `holder_mismatch`, `not_held`, `bad_query` or `contended`. See [Exit codes](docs/interface.md#exit-codes).
+Exit codes follow the design guide. The tool-specific code is 22: `next` found no eligible candidate (`list` always exits 0 and reports `empty`). Errors carry a closed `error.code` per exit (`invalid_argument`, `not_found`, `partial_results`, `lower_failed`, `refused`, `ambiguous_key` and others) and a separate `error.reason` such as `claimed`, `done`, `gone`, `skipped`, `hidden`, `holder_mismatch`, `not_held`, `not_in_pool`, `bad_query`, `invalid_config` (an invalid config is exit 2 `invalid_argument`, reason `invalid_config`), `unsafe_path`, `too_many_labels`, `result_file_exists`, `contended` or `deadline`. A board has the status `ok`, `refresh_failed`, `truncated`, `disabled` (a configuration error, retried on every refresh) or `excluded` (`enabled: false`; never affects an exit code). Every command accepts `--yes` and ignores it (no command asks for confirmation). See [Exit codes](docs/interface.md#exit-codes).
 
 ## Dependencies
 

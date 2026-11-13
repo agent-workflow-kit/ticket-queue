@@ -40,8 +40,8 @@
         "$ref": "#/$defs/key"
       },
       "uniqueItems": true,
-      "maxItems": 16,
-      "description": "Aliases: keys a ticket was requested or made under before it moved."
+      "maxItems": 20,
+      "description": "The ticket's aliases, sorted (the newest 20): keys it was requested or made under before it moved. Carried and required by every object that identifies a ticket with key and site, except browse-result and error envelopes; board hooks carry []."
     },
     "cron_interval": {
       "enum": [
@@ -417,8 +417,12 @@
         "human_only",
         "too_expensive",
         "invalid_interval",
+        "unsafe_path",
+        "too_many_labels",
+        "result_file_exists",
         "contended",
         "output_too_large",
+        "deadline",
         "claimed",
         "done",
         "gone",
@@ -426,9 +430,10 @@
         "hidden",
         "holder_mismatch",
         "not_held",
-        "rerank_disabled"
+        "rerank_disabled",
+        "not_in_pool"
       ],
-      "description": "Exit 2: bad_query, unknown_field, order_by_not_allowed, invalid_config, site_required, claim_required, human_only, too_expensive, invalid_interval. Exit 12: contended, output_too_large. Exit 20: claimed, done, gone, skipped, hidden, holder_mismatch, not_held, rerank_disabled."
+      "description": "Exit 2: bad_query, unknown_field, order_by_not_allowed, invalid_config, site_required, claim_required, human_only, too_expensive, invalid_interval, unsafe_path, too_many_labels, result_file_exists. Exit 12: contended, output_too_large, deadline (a ticketctl child killed after 300 seconds). Exit 20: claimed, done, gone, skipped, hidden, holder_mismatch, not_held, rerank_disabled, not_in_pool."
     },
     "lower_error": {
       "type": "object",
@@ -524,7 +529,8 @@
         "weights_differ",
         "pass_env_overlap",
         "browse_query_invalid"
-      ]
+      ],
+      "description": "Each code is defined where the interface emits it. soft_rule_overridden: a pin or a named claim overrode a soft rule that failed or was unknown (rule is set). Command-level warnings go in the output's warnings; board warnings (estimate_ambiguous, departures_unchecked, me_unknown) in boards[].warnings."
     },
     "warning": {
       "type": "object",
@@ -622,6 +628,7 @@
       "required": [
         "key",
         "site",
+        "requested_keys",
         "board",
         "holder",
         "labels",
@@ -640,7 +647,8 @@
         "gone",
         "reassigned",
         "moved"
-      ]
+      ],
+      "description": "The first that holds of gone, done, reassigned, moved (the claim's claimed_key is now an alias of the canonical key), ok. A renewal under the canonical key ends moved."
     },
     "pin": {
       "type": "object",
@@ -690,6 +698,7 @@
       "required": [
         "key",
         "site",
+        "requested_keys",
         "pin_position",
         "expires_at",
         "blocked"
@@ -743,6 +752,7 @@
       "required": [
         "key",
         "site",
+        "requested_keys",
         "source",
         "until",
         "reason"
@@ -806,8 +816,10 @@
         "ok",
         "refresh_failed",
         "truncated",
-        "disabled"
-      ]
+        "disabled",
+        "excluded"
+      ],
+      "description": "ok, refresh_failed, truncated; disabled: the last refresh failed with a configuration error (retried on every refresh until one succeeds); excluded: enabled false in config."
     },
     "board_state": {
       "type": "object",
@@ -889,6 +901,10 @@
             "departures_checked": {
               "type": "integer",
               "minimum": 0
+            },
+            "departures_unchecked": {
+              "type": "integer",
+              "minimum": 0
             }
           },
           "additionalProperties": false,
@@ -896,11 +912,9 @@
             "fetched",
             "upserted",
             "members_removed",
-            "departures_checked"
+            "departures_checked",
+            "departures_unchecked"
           ]
-        },
-        "departures_unchecked": {
-          "type": "boolean"
         },
         "pool": {
           "type": "integer",
@@ -937,12 +951,14 @@
           "oneOf": [
             {
               "type": "integer",
-              "minimum": 0
+              "minimum": 0,
+              "description": "Seconds remaining at output time."
             },
             {
               "type": "null"
             }
-          ]
+          ],
+          "description": "Seconds remaining at output time; null when none is pending."
         },
         "lower_error": {
           "$ref": "#/$defs/lower_error"
@@ -953,11 +969,12 @@
         "rerank": {
           "enum": [
             "off",
+            "none",
             "ok",
-            "failed",
             "expired",
-            "none"
-          ]
+            "failed"
+          ],
+          "description": "off: re-rank not enabled for the board; none: enabled, no result; ok: a valid result applies; expired or failed: the last run failed or its result expired (the deterministic order applies)."
         },
         "duration_ms": {
           "type": "integer",
@@ -969,7 +986,7 @@
         "board",
         "status"
       ],
-      "description": "status disabled means a configuration error or enabled: false; rerank_disabled is never a board status."
+      "description": "status excluded is enabled: false; status disabled is a configuration error of the last refresh; rerank_disabled is never a board status. pool counts the board's member rows; eligible counts the candidates it owns. counts.departures_unchecked above 0 adds the warning departures_unchecked."
     },
     "ticket_base": {
       "type": "object",
@@ -979,6 +996,9 @@
         },
         "site": {
           "$ref": "#/$defs/site_name"
+        },
+        "requested_keys": {
+          "$ref": "#/$defs/requested_keys"
         },
         "url": {
           "type": "string",
@@ -1166,6 +1186,7 @@
       "required": [
         "key",
         "site",
+        "requested_keys",
         "url",
         "title",
         "type",
@@ -1193,6 +1214,9 @@
         },
         "site": {
           "$ref": "#/$defs/site_name"
+        },
+        "requested_keys": {
+          "$ref": "#/$defs/requested_keys"
         },
         "url": {
           "type": "string",
@@ -1455,6 +1479,7 @@
       "required": [
         "key",
         "site",
+        "requested_keys",
         "url",
         "title",
         "type",
@@ -1482,7 +1507,27 @@
         "skipped",
         "warnings"
       ],
-      "description": "ticketctl's ticket plus ticket-queue's own fields; no description (only show prints it). `reasons` (the exclusion reasons) is present with list --all. board, score and position are null for a ticket in no pool."
+      "description": "ticketctl's ticket plus ticket-queue's own fields; no description (only show prints it). `reasons` (the exclusion reasons) is present with list --all. board, score and position are null for a ticket in no pool (a ticket in no pool has no board, score or position).",
+      "if": {
+        "properties": {
+          "board": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "board"
+        ]
+      },
+      "then": {
+        "properties": {
+          "score": {
+            "type": "null"
+          },
+          "position": {
+            "type": "null"
+          }
+        }
+      }
     },
     "ticket_full": {
       "type": "object",
@@ -1492,6 +1537,9 @@
         },
         "site": {
           "$ref": "#/$defs/site_name"
+        },
+        "requested_keys": {
+          "$ref": "#/$defs/requested_keys"
         },
         "url": {
           "type": "string",
@@ -1779,6 +1827,7 @@
       "required": [
         "key",
         "site",
+        "requested_keys",
         "url",
         "title",
         "type",
@@ -1808,7 +1857,27 @@
         "description",
         "description_read_at"
       ],
-      "description": "The ticket as show prints it: with description, description_read_at (the last get) and degraded (a stub ticketctl could not parse)."
+      "description": "The ticket as show prints it: with description, description_read_at (the last get) and degraded (a stub ticketctl could not parse).",
+      "if": {
+        "properties": {
+          "board": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "board"
+        ]
+      },
+      "then": {
+        "properties": {
+          "score": {
+            "type": "null"
+          },
+          "position": {
+            "type": "null"
+          }
+        }
+      }
     },
     "refreshed_at": {
       "type": "object",

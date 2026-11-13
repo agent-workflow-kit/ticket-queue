@@ -17,6 +17,9 @@
         "$ref": "../rerank-input.json"
       }
     },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
     "complete": {
       "type": "boolean"
     },
@@ -39,6 +42,7 @@
   "additionalProperties": false,
   "required": [
     "results",
+    "warnings",
     "complete",
     "errors",
     "boards",

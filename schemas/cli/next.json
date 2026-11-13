@@ -39,18 +39,35 @@
           "site": {
             "$ref": "../defs.json#/$defs/site_name"
           },
+          "requested_keys": {
+            "$ref": "../defs.json#/$defs/requested_keys"
+          },
           "outcome": {
             "const": "claim_skipped"
           },
           "reason": {
-            "type": "string",
-            "maxLength": 128
+            "enum": [
+              "done",
+              "gone",
+              "hidden",
+              "claimed",
+              "skipped",
+              "status",
+              "pointed",
+              "sprint",
+              "unblocked",
+              "assignee",
+              "parent",
+              "read_failed"
+            ],
+            "description": "The failing rule's name, gone for a ticket not found, or read_failed for any other per-key error."
           }
         },
         "additionalProperties": false,
         "required": [
           "key",
           "site",
+          "requested_keys",
           "outcome",
           "reason"
         ]
@@ -103,6 +120,7 @@
     "ticket",
     "claim",
     "passed_over",
+    "warnings",
     "refreshed_at",
     "stale",
     "complete",

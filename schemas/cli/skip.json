@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-queue/cli/skip.json",
   "title": "skip --json",
-  "description": "skip is the record written.",
+  "description": "skip is the record written (a skip of a skipped ticket replaces it).",
   "type": "object",
   "properties": {
     "key": {
@@ -10,6 +10,9 @@
     },
     "site": {
       "$ref": "../defs.json#/$defs/site_name"
+    },
+    "requested_keys": {
+      "$ref": "../defs.json#/$defs/requested_keys"
     },
     "skip": {
       "oneOf": [
@@ -24,6 +27,9 @@
     "unchanged": {
       "type": "boolean"
     },
+    "warnings": {
+      "$ref": "../defs.json#/$defs/warnings"
+    },
     "dry_run": {
       "type": "boolean"
     }
@@ -32,8 +38,10 @@
   "required": [
     "key",
     "site",
+    "requested_keys",
     "skip",
     "unchanged",
+    "warnings",
     "dry_run"
   ]
 }
