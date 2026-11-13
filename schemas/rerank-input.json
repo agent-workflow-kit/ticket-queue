@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-queue/rerank-input.json",
   "title": "Re-rank input document (stdin of a custom command; candidates.md of the bundled implementation)",
-  "description": "The text fields of a candidate (title, description, labels, epic and parent titles) are untrusted and travel inside an <untrusted> fence in the bundled implementation. goals is the board's trusted free text.",
+  "description": "The text fields of a candidate (title, description, labels, epic and parent titles) are untrusted and travel inside an <untrusted> fence in the bundled implementation. goals is the board's trusted free text (at most 2000 characters). Every untrusted field is cut before the size is measured: title 200 characters, at most 20 labels of 64, epic and parent titles 120, description rerank.description_chars (at most 1000).",
   "type": "object",
   "properties": {
     "schema_version": {
@@ -16,7 +16,7 @@
     },
     "goals": {
       "type": "string",
-      "maxLength": 20000
+      "maxLength": 2000
     },
     "prioritized_epics": {
       "type": "array",
@@ -154,14 +154,14 @@
           },
           "title": {
             "type": "string",
-            "maxLength": 4096,
+            "maxLength": 200,
             "x-untrusted": true
           },
           "description": {
             "oneOf": [
               {
                 "type": "string",
-                "maxLength": 8192,
+                "maxLength": 1000,
                 "x-untrusted": true
               },
               {
@@ -232,7 +232,7 @@
                     "oneOf": [
                       {
                         "type": "string",
-                        "maxLength": 4096,
+                        "maxLength": 120,
                         "x-untrusted": true
                       },
                       {
@@ -264,7 +264,7 @@
                     "oneOf": [
                       {
                         "type": "string",
-                        "maxLength": 4096,
+                        "maxLength": 120,
                         "x-untrusted": true
                       },
                       {
@@ -288,9 +288,10 @@
             "type": "array",
             "items": {
               "type": "string",
-              "maxLength": 256,
+              "maxLength": 64,
               "x-untrusted": true
-            }
+            },
+            "maxItems": 20
           },
           "due_date": {
             "oneOf": [

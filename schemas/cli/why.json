@@ -183,6 +183,30 @@
         }
       ]
     },
+    "failures": {
+      "type": "object",
+      "properties": {
+        "consecutive_failures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "last_failure_at": {
+          "oneOf": [
+            {
+              "$ref": "../defs.json#/$defs/ts"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "consecutive_failures",
+        "last_failure_at"
+      ]
+    },
     "rerank": {
       "oneOf": [
         {
@@ -237,6 +261,7 @@
     "skip",
     "claim",
     "claim_state",
+    "failures",
     "rerank",
     "rerank_summary",
     "warnings",

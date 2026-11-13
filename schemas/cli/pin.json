@@ -35,7 +35,7 @@
           "site": {
             "$ref": "../defs.json#/$defs/site_name"
           },
-          "position": {
+          "pin_position": {
             "type": "integer",
             "minimum": 1
           }
@@ -44,7 +44,7 @@
         "required": [
           "key",
           "site",
-          "position"
+          "pin_position"
         ]
       }
     },

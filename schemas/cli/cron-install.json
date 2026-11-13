@@ -12,7 +12,7 @@
       "type": "boolean"
     },
     "interval": {
-      "$ref": "../defs.json#/$defs/duration"
+      "$ref": "../defs.json#/$defs/cron_interval"
     },
     "block": {
       "type": "array",

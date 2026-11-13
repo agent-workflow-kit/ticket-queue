@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-queue/cli/show.json",
   "title": "show --json",
-  "description": "One stored ticket with its verdicts and state. Reads the store only.",
+  "description": "One stored ticket with its verdicts and state, including description and description_read_at. Reads the store only.",
   "type": "object",
   "properties": {
     "ticket": {
-      "$ref": "../defs.json#/$defs/ticket"
+      "$ref": "../defs.json#/$defs/ticket_full"
     },
     "refreshed_at": {
       "$ref": "../defs.json#/$defs/refreshed_at"

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-queue/hooks/post-claim.json",
   "title": "post-claim hook payload (stdin)",
-  "description": "After a claim is written (claim, next --claim). object_id is the ticket key. Delivered at least once through the outbox; deduplicate on event_id. No ticket text and no repo.",
+  "description": "After a new claim is written, or a renewal that adds a label (claim, next --claim). object_id is <site>:<KEY>. Delivered at least once through the outbox; deduplicate on event_id; delivery order is not guaranteed, order by seq. Consumers tolerate unknown keys. No ticket text and no repo.",
   "type": "object",
   "properties": {
     "tool": {
@@ -14,12 +14,21 @@
     "event_id": {
       "$ref": "../defs.json#/$defs/event_id"
     },
+    "event_ts": {
+      "$ref": "../defs.json#/$defs/ts"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic per store; consumers order by seq."
+    },
     "object_type": {
       "const": "ticket"
     },
     "object_id": {
       "type": "string",
-      "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+      "pattern": "^[A-Za-z0-9._:-]{1,128}$",
+      "description": "<site>:<KEY> for a ticket, the board name for a board."
     },
     "board": {
       "oneOf": [
@@ -64,11 +73,14 @@
     "labels": {
       "$ref": "../defs.json#/$defs/claim_labels"
     },
-    "counts": {
-      "$ref": "../defs.json#/$defs/counts"
+    "requested_keys": {
+      "$ref": "../defs.json#/$defs/requested_keys"
     },
     "renewed": {
       "type": "boolean"
+    },
+    "claimed_at": {
+      "$ref": "../defs.json#/$defs/ts"
     },
     "expires_at": {
       "$ref": "../defs.json#/$defs/ts"
@@ -83,6 +95,8 @@
     "tool",
     "hook",
     "event_id",
+    "event_ts",
+    "seq",
     "object_type",
     "object_id",
     "board",
@@ -90,8 +104,9 @@
     "site",
     "holder",
     "labels",
-    "counts",
+    "requested_keys",
     "renewed",
+    "claimed_at",
     "expires_at",
     "ttl_s"
   ]

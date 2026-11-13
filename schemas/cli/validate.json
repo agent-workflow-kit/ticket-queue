@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-queue/cli/validate.json",
   "title": "validate --json",
-  "description": "Config, plugin and ticketctl checks; probe is present only with --probe.",
+  "description": "Config, plugin, ticketctl and claude-session checks; probe is present only with --probe. Exit 0 when ok, 12 (partial_results, normal output) when a check fails, 2 for an invalid config.",
   "type": "object",
   "properties": {
     "ok": {
@@ -112,6 +112,10 @@
         }
       ]
     },
+    "undelivered_events": {
+      "type": "integer",
+      "minimum": 0
+    },
     "warnings": {
       "$ref": "../defs.json#/$defs/warnings"
     }
@@ -121,6 +125,7 @@
     "ok",
     "checks",
     "probe",
+    "undelivered_events",
     "warnings"
   ]
 }

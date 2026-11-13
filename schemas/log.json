@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-queue/log.json",
   "title": "ticket-queue log.jsonl record",
-  "description": "Public operational log, one record per line. No ticket text beyond keys (a skip reason is recorded as a byte count). level is optional.",
+  "description": "Public operational log, one record per line (export prints these lines). No ticket text beyond keys (a skip reason is recorded as a byte count). A lapsed claim is a release record with reason lapsed. level is optional; decision_ids appear only in the log (there is no audit file).",
   "oneOf": [
     {
       "type": "object",
@@ -12,6 +12,11 @@
         },
         "v": {
           "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
         },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
@@ -27,8 +32,18 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "board": {
           "$ref": "defs.json#/$defs/board_name"
@@ -63,8 +78,10 @@
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "board",
         "status",
@@ -81,6 +98,11 @@
         "v": {
           "const": 1
         },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
         },
@@ -95,14 +117,30 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "key": {
           "$ref": "defs.json#/$defs/key"
         },
         "site": {
           "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
         },
         "board": {
           "oneOf": [
@@ -129,16 +167,15 @@
         },
         "expires_at": {
           "$ref": "defs.json#/$defs/ts"
-        },
-        "labels": {
-          "$ref": "defs.json#/$defs/claim_labels"
         }
       },
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "key",
         "site",
@@ -155,6 +192,11 @@
         "v": {
           "const": 1
         },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
         },
@@ -169,14 +211,34 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "key": {
           "$ref": "defs.json#/$defs/key"
         },
         "site": {
           "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "tty": {
+          "type": "boolean",
+          "description": "Whether stdin was a terminal."
         },
         "board": {
           "oneOf": [
@@ -205,10 +267,7 @@
           "type": "boolean"
         },
         "reason": {
-          "enum": [
-            "released",
-            "pruned"
-          ]
+          "$ref": "defs.json#/$defs/release_reason"
         },
         "consecutive_failures": {
           "type": "integer",
@@ -218,79 +277,15 @@
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "key",
         "site",
-        "failed"
-      ]
-    },
-    {
-      "type": "object",
-      "properties": {
-        "event": {
-          "const": "claim_lapsed"
-        },
-        "v": {
-          "const": 1
-        },
-        "ts": {
-          "$ref": "defs.json#/$defs/ts"
-        },
-        "level": {
-          "enum": [
-            "debug",
-            "info",
-            "warn",
-            "error"
-          ]
-        },
-        "actor": {
-          "$ref": "defs.json#/$defs/actor"
-        },
-        "decision_ids": {
-          "$ref": "defs.json#/$defs/decision_ids"
-        },
-        "key": {
-          "$ref": "defs.json#/$defs/key"
-        },
-        "site": {
-          "$ref": "defs.json#/$defs/site_name"
-        },
-        "board": {
-          "oneOf": [
-            {
-              "$ref": "defs.json#/$defs/board_name"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "holder": {
-          "oneOf": [
-            {
-              "$ref": "defs.json#/$defs/holder"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "expires_at": {
-          "$ref": "defs.json#/$defs/ts"
-        }
-      },
-      "additionalProperties": false,
-      "required": [
-        "event",
-        "ts",
-        "actor",
-        "decision_ids",
-        "key",
-        "site",
-        "expires_at"
+        "failed",
+        "reason"
       ]
     },
     {
@@ -302,6 +297,11 @@
         "v": {
           "const": 1
         },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
         },
@@ -316,14 +316,30 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "key": {
           "$ref": "defs.json#/$defs/key"
         },
         "site": {
           "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
         },
         "failures": {
           "type": "integer",
@@ -333,8 +349,10 @@
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "key",
         "site",
@@ -350,6 +368,11 @@
         "v": {
           "const": 1
         },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
         },
@@ -364,8 +387,18 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "key": {
           "$ref": "defs.json#/$defs/key"
@@ -373,7 +406,17 @@
         "site": {
           "$ref": "defs.json#/$defs/site_name"
         },
-        "position": {
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "tty": {
+          "type": "boolean",
+          "description": "Whether stdin was a terminal."
+        },
+        "pin_position": {
           "type": "integer",
           "minimum": 1
         },
@@ -391,12 +434,14 @@
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "key",
         "site",
-        "position"
+        "pin_position"
       ]
     },
     {
@@ -407,6 +452,11 @@
         },
         "v": {
           "const": 1
+        },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
         },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
@@ -422,21 +472,43 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "key": {
           "$ref": "defs.json#/$defs/key"
         },
         "site": {
           "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "tty": {
+          "type": "boolean",
+          "description": "Whether stdin was a terminal."
         }
       },
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "key",
         "site"
@@ -451,6 +523,11 @@
         "v": {
           "const": 1
         },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
         },
@@ -465,14 +542,34 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "key": {
           "$ref": "defs.json#/$defs/key"
         },
         "site": {
           "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "tty": {
+          "type": "boolean",
+          "description": "Whether stdin was a terminal."
         },
         "from": {
           "type": "integer",
@@ -486,8 +583,10 @@
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "key",
         "site",
@@ -503,6 +602,11 @@
         "v": {
           "const": 1
         },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
         },
@@ -517,14 +621,34 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "key": {
           "$ref": "defs.json#/$defs/key"
         },
         "site": {
           "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "tty": {
+          "type": "boolean",
+          "description": "Whether stdin was a terminal."
         },
         "source": {
           "enum": [
@@ -550,8 +674,10 @@
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "key",
         "site",
@@ -567,6 +693,11 @@
         "v": {
           "const": 1
         },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
         },
@@ -581,21 +712,43 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "key": {
           "$ref": "defs.json#/$defs/key"
         },
         "site": {
           "$ref": "defs.json#/$defs/site_name"
+        },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
+        "tty": {
+          "type": "boolean",
+          "description": "Whether stdin was a terminal."
         }
       },
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "key",
         "site"
@@ -610,6 +763,11 @@
         "v": {
           "const": 1
         },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
         },
@@ -624,8 +782,18 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "key": {
           "$ref": "defs.json#/$defs/key"
@@ -633,20 +801,27 @@
         "site": {
           "$ref": "defs.json#/$defs/site_name"
         },
+        "labels": {
+          "$ref": "defs.json#/$defs/claim_labels"
+        },
+        "requested_keys": {
+          "$ref": "defs.json#/$defs/requested_keys"
+        },
         "reason": {
           "enum": [
             "done",
             "gone",
-            "expired",
-            "removed"
+            "expired"
           ]
         }
       },
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "key",
         "site",
@@ -662,6 +837,11 @@
         "v": {
           "const": 1
         },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
         },
@@ -676,8 +856,18 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "board": {
           "$ref": "defs.json#/$defs/board_name"
@@ -739,13 +929,19 @@
               "type": "null"
             }
           ]
+        },
+        "candidates_dropped": {
+          "type": "integer",
+          "minimum": 0
         }
       },
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "board",
         "outcome"
@@ -760,6 +956,11 @@
         "v": {
           "const": 1
         },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
         },
@@ -774,8 +975,18 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "board": {
           "$ref": "defs.json#/$defs/board_name"
@@ -787,8 +998,10 @@
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "board",
         "reason"
@@ -803,6 +1016,11 @@
         "v": {
           "const": 1
         },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
         },
@@ -817,8 +1035,18 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "dry_run": {
           "type": "boolean"
@@ -830,8 +1058,10 @@
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "counts"
       ]
@@ -845,6 +1075,11 @@
         "v": {
           "const": 1
         },
+        "seq": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Monotonic per store (shared with outbox events)."
+        },
         "ts": {
           "$ref": "defs.json#/$defs/ts"
         },
@@ -859,14 +1094,28 @@
         "actor": {
           "$ref": "defs.json#/$defs/actor"
         },
+        "actor_source": {
+          "enum": [
+            "flag",
+            "default"
+          ],
+          "description": "flag: --actor was given; default: derived."
+        },
         "decision_ids": {
           "$ref": "defs.json#/$defs/decision_ids"
+        },
+        "event_id": {
+          "$ref": "defs.json#/$defs/event_id"
         },
         "hook": {
           "$ref": "defs.json#/$defs/hook_name"
         },
-        "event_id": {
-          "$ref": "defs.json#/$defs/event_id"
+        "attempts": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "final": {
+          "type": "boolean"
         },
         "exit": {
           "oneOf": [
@@ -885,11 +1134,15 @@
       "additionalProperties": false,
       "required": [
         "event",
+        "seq",
         "ts",
         "actor",
+        "actor_source",
         "decision_ids",
         "hook",
-        "event_id"
+        "event_id",
+        "attempts",
+        "final"
       ]
     }
   ]

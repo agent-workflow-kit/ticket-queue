@@ -15,6 +15,10 @@
           "type": "integer",
           "minimum": 0
         },
+        "member_rows": {
+          "type": "integer",
+          "minimum": 0
+        },
         "rerank_results": {
           "type": "integer",
           "minimum": 0
@@ -23,7 +27,23 @@
           "type": "integer",
           "minimum": 0
         },
+        "events_expired": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "claims_lapsed": {
+          "type": "integer",
+          "minimum": 0
+        },
         "claims_released": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tmp_dirs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sessions": {
           "type": "integer",
           "minimum": 0
         }
@@ -31,9 +51,14 @@
       "additionalProperties": false,
       "required": [
         "tickets",
+        "member_rows",
         "rerank_results",
         "events",
-        "claims_released"
+        "events_expired",
+        "claims_lapsed",
+        "claims_released",
+        "tmp_dirs",
+        "sessions"
       ]
     },
     "warnings": {

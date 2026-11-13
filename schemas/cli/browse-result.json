@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-queue/cli/browse-result.json",
   "title": "browse --result-file document",
-  "description": "Written by the TUI on exit 0 when --result-file is given. Ids only; no ticket text.",
+  "description": "Written by the TUI on exit 0 when --result-file is given. Ids only; no ticket text. intent start carries exactly one selected ticket.",
   "type": "object",
   "properties": {
     "intent": {
@@ -47,5 +47,23 @@
   "required": [
     "intent",
     "selected"
-  ]
+  ],
+  "if": {
+    "properties": {
+      "intent": {
+        "const": "start"
+      }
+    },
+    "required": [
+      "intent"
+    ]
+  },
+  "then": {
+    "properties": {
+      "selected": {
+        "minItems": 1,
+        "maxItems": 1
+      }
+    }
+  }
 }

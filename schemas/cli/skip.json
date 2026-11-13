@@ -12,7 +12,14 @@
       "$ref": "../defs.json#/$defs/site_name"
     },
     "skip": {
-      "$ref": "../defs.json#/$defs/skip"
+      "oneOf": [
+        {
+          "$ref": "../defs.json#/$defs/skip"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "unchanged": {
       "type": "boolean"

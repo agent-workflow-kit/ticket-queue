@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-queue/cli/cron-uninstall.json",
   "title": "cron uninstall --json",
-  "description": "removed is false when no block was present.",
+  "description": "removed is false when no block was present (exit 0).",
   "type": "object",
   "properties": {
     "removed": {

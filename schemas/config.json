@@ -11,10 +11,6 @@
         "name": {
           "type": "string",
           "pattern": "^[A-Za-z0-9._@-]{1,64}$"
-        },
-        "jira": {
-          "type": "string",
-          "maxLength": 256
         }
       },
       "additionalProperties": false
@@ -84,6 +80,27 @@
         "dead_grace": {
           "$ref": "#/$defs/duration",
           "default": "7d"
+        },
+        "scan_limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20
+        }
+      },
+      "additionalProperties": false
+    },
+    "claude_session": {
+      "type": "object",
+      "properties": {
+        "pass_env": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}$"
+          },
+          "uniqueItems": true,
+          "default": []
         }
       },
       "additionalProperties": false
@@ -167,7 +184,7 @@
         "description_chars": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 8192,
+          "maximum": 1000,
           "default": 1000
         },
         "ttl": {
@@ -198,13 +215,25 @@
             }
           ]
         },
+        "plugin_dir": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "sandbox": {
           "enum": [
             "required",
             "preferred",
             "off"
           ],
-          "default": "preferred"
+          "default": "preferred",
+          "description": "off is accepted only with a custom rerank.command (see the allOf below)."
         },
         "setting_sources": {
           "type": "array",
@@ -239,7 +268,32 @@
           "default": "150s"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "type": "array"
+              }
+            },
+            "required": [
+              "command"
+            ]
+          },
+          "then": {},
+          "else": {
+            "properties": {
+              "sandbox": {
+                "enum": [
+                  "required",
+                  "preferred"
+                ]
+              }
+            }
+          }
+        }
+      ]
     },
     "hidden": {
       "type": "object",
@@ -362,6 +416,10 @@
             "$ref": "#/$defs/hook_entry"
           },
           "default": []
+        },
+        "refresh_repeat": {
+          "$ref": "#/$defs/duration",
+          "default": "6h"
         }
       },
       "additionalProperties": false
@@ -404,6 +462,10 @@
       "properties": {
         "site": {
           "$ref": "#/$defs/site_name"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
         },
         "source": {
           "oneOf": [
@@ -480,17 +542,18 @@
         },
         "goals": {
           "type": "string",
-          "maxLength": 20000,
+          "maxLength": 2000,
           "default": ""
         },
         "goals_file": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Relative to the config file's directory; read at each use (at most 16 KiB)."
         },
         "prioritized_epics": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/key"
+            "$ref": "#/$defs/key_input"
           },
           "uniqueItems": true,
           "default": []
@@ -498,7 +561,7 @@
         "parent_allow": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/key"
+            "$ref": "#/$defs/key_input"
           },
           "uniqueItems": true,
           "default": []
@@ -506,7 +569,7 @@
         "parent_deny": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/key"
+            "$ref": "#/$defs/key_input"
           },
           "uniqueItems": true,
           "default": []
@@ -571,41 +634,49 @@
             "priority": {
               "type": "number",
               "minimum": 0,
+              "maximum": 1000,
               "default": 40
             },
             "sprint": {
               "type": "number",
               "minimum": 0,
+              "maximum": 1000,
               "default": 25
             },
             "epic": {
               "type": "number",
               "minimum": 0,
+              "maximum": 1000,
               "default": 20
             },
             "due": {
               "type": "number",
               "minimum": 0,
+              "maximum": 1000,
               "default": 20
             },
             "assignee": {
               "type": "number",
               "minimum": 0,
+              "maximum": 1000,
               "default": 10
             },
             "age": {
               "type": "number",
               "minimum": 0,
+              "maximum": 1000,
               "default": 5
             },
             "labels": {
               "type": "number",
               "minimum": 0,
+              "maximum": 1000,
               "default": 0
             },
             "size": {
               "type": "number",
               "minimum": 0,
+              "maximum": 1000,
               "default": 0
             }
           },
@@ -621,6 +692,8 @@
                 "minimum": 0,
                 "maximum": 1
               },
+              "maxProperties": 64,
+              "description": "Entries overlay the defaults per name (case-insensitive); values 0 to 1.",
               "default": {
                 "Highest": 1,
                 "High": 0.75,
@@ -657,8 +730,10 @@
               "type": "object",
               "additionalProperties": {
                 "type": "number",
-                "minimum": 0
+                "minimum": 0,
+                "maximum": 1
               },
+              "maxProperties": 256,
               "default": {}
             }
           },
@@ -668,14 +743,30 @@
           "type": "object",
           "properties": {
             "enabled": {
-              "type": "boolean",
-              "default": false
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "null: re-rank when the global rerank.enabled is true and this is not false."
             },
             "top_n": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 30,
-              "default": 20
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 30
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "null: the global rerank.top_n."
             }
           },
           "additionalProperties": false
@@ -684,7 +775,13 @@
       "additionalProperties": false,
       "required": [
         "source"
-      ]
+      ],
+      "not": {
+        "required": [
+          "goals",
+          "goals_file"
+        ]
+      }
     },
     "hook_entry": {
       "type": "object",
@@ -717,28 +814,28 @@
         "cmd"
       ]
     },
-    "project_key": {
-      "type": "string",
-      "pattern": "^[A-Z][A-Z0-9_]*$",
-      "maxLength": 64
-    },
     "board_name": {
       "type": "string",
       "pattern": "^[a-z][a-z0-9_-]{0,63}$"
     },
-    "site_name": {
+    "key_input": {
       "type": "string",
-      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*-[0-9]+$",
+      "maxLength": 64,
+      "description": "A ticket key as typed in config: any letter case, stored upper-case."
     },
     "duration": {
       "type": "string",
       "pattern": "^[0-9]{1,6}(ms|s|m|h|d|w)$"
     },
-    "key": {
+    "project_key": {
       "type": "string",
-      "pattern": "^[A-Z][A-Z0-9_]*-[0-9]+$",
-      "maxLength": 64,
-      "description": "Ticket key, printed upper-case."
+      "pattern": "^[A-Z][A-Z0-9_]*$",
+      "maxLength": 64
+    },
+    "site_name": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"
     }
   }
 }

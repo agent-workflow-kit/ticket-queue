@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-queue/cli/next.json",
   "title": "next --json",
-  "description": "The top eligible ticket. With no candidate (exit 22) empty is true and ticket null. passed_over lists tickets that failed the live re-check under --claim. claim is the written claim with --claim, else null.",
+  "description": "The top eligible ticket. With no candidate (exit 22) empty is true and ticket null. passed_over lists tickets that failed the live re-check under --claim. claim is the written claim with --claim, else null. refresh holds the per-board results when --refresh ran (a partial refresh with a candidate is exit 0 with warning refresh_partial).",
   "type": "object",
   "properties": {
     "empty": {
@@ -27,9 +27,6 @@
           "type": "null"
         }
       ]
-    },
-    "renewed": {
-      "type": "boolean"
     },
     "passed_over": {
       "type": "array",
@@ -59,8 +56,18 @@
         ]
       }
     },
-    "refreshed": {
-      "type": "boolean"
+    "refresh": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "../defs.json#/$defs/board_state"
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "warnings": {
       "$ref": "../defs.json#/$defs/warnings"

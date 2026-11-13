@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ticket-queue/hooks/post-refresh.json",
   "title": "post-refresh hook payload (stdin)",
-  "description": "After a refresh in which a board failed or was truncated, or a claimed ticket's state changed to non-ok. object_id is the board name (or the first failing board). Delivered at least once through the outbox; deduplicate on event_id. No ticket text and no repo.",
+  "description": "After a refresh in which a board's status or error code changed (recovery included) or a claimed ticket's state changed (either direction), and at most once per hooks.refresh_repeat while a board stays failed. object_id is the board name (or the first board that changed). Delivered at least once through the outbox; deduplicate on event_id; delivery order is not guaranteed, order by seq. Consumers tolerate unknown keys. No ticket text and no repo.",
   "type": "object",
   "properties": {
     "tool": {
@@ -14,12 +14,21 @@
     "event_id": {
       "$ref": "../defs.json#/$defs/event_id"
     },
+    "event_ts": {
+      "$ref": "../defs.json#/$defs/ts"
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic per store; consumers order by seq."
+    },
     "object_type": {
       "const": "board"
     },
     "object_id": {
       "type": "string",
-      "pattern": "^[A-Za-z0-9._:-]{1,128}$"
+      "pattern": "^[A-Za-z0-9._:-]{1,128}$",
+      "description": "<site>:<KEY> for a ticket, the board name for a board."
     },
     "board": {
       "oneOf": [
@@ -64,8 +73,8 @@
     "labels": {
       "$ref": "../defs.json#/$defs/claim_labels"
     },
-    "counts": {
-      "$ref": "../defs.json#/$defs/counts"
+    "requested_keys": {
+      "$ref": "../defs.json#/$defs/requested_keys"
     },
     "boards": {
       "type": "array",
@@ -78,10 +87,42 @@
           "status": {
             "$ref": "../defs.json#/$defs/board_status"
           },
+          "previous_status": {
+            "oneOf": [
+              {
+                "$ref": "../defs.json#/$defs/board_status"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "error_code": {
             "oneOf": [
               {
                 "$ref": "../defs.json#/$defs/error_code"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lower_code": {
+            "oneOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "retry_after": {
+            "oneOf": [
+              {
+                "type": "integer",
+                "minimum": 0
               },
               {
                 "type": "null"
@@ -93,7 +134,10 @@
         "required": [
           "board",
           "status",
-          "error_code"
+          "previous_status",
+          "error_code",
+          "lower_code",
+          "retry_after"
         ]
       }
     },
@@ -108,7 +152,26 @@
           "site": {
             "$ref": "../defs.json#/$defs/site_name"
           },
+          "holder": {
+            "oneOf": [
+              {
+                "$ref": "../defs.json#/$defs/holder"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "labels": {
+            "$ref": "../defs.json#/$defs/claim_labels"
+          },
+          "requested_keys": {
+            "$ref": "../defs.json#/$defs/requested_keys"
+          },
           "ticket_state": {
+            "$ref": "../defs.json#/$defs/claim_state"
+          },
+          "previous_state": {
             "$ref": "../defs.json#/$defs/claim_state"
           }
         },
@@ -116,7 +179,11 @@
         "required": [
           "key",
           "site",
-          "ticket_state"
+          "holder",
+          "labels",
+          "requested_keys",
+          "ticket_state",
+          "previous_state"
         ]
       }
     }
@@ -126,6 +193,8 @@
     "tool",
     "hook",
     "event_id",
+    "event_ts",
+    "seq",
     "object_type",
     "object_id",
     "board",
@@ -133,7 +202,7 @@
     "site",
     "holder",
     "labels",
-    "counts",
+    "requested_keys",
     "boards",
     "changed_claims"
   ]
